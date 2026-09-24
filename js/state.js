@@ -76,10 +76,23 @@ export const state = reactive({
   async ladeConfig() {
     console.log("[Vorstandsportal] ladeConfig() gestartet");
     try {
-      this.config =
-        await ladeConfigDaten(
-          "/webhook/vorstand-config"
+      try {
+        this.config =
+          await ladeConfigDaten(
+            "/webhook/vorstand-config"
+          );
+      } catch (webhookError) {
+        // Solange n8n den Endpunkt nicht bereitstellt, lokale Testdaten verwenden.
+        console.warn(
+          "[Vorstandsportal] /webhook/vorstand-config nicht erreichbar, verwende config.local.json:",
+          webhookError
         );
+
+        this.config =
+          await ladeConfigDaten(
+            "config.local.json"
+          );
+      }
 
       console.log("[Vorstandsportal] Konfiguration im State übernommen");
 
