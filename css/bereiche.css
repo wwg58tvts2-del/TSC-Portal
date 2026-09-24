@@ -1,0 +1,20 @@
+/* Darstellung admin-gepflegter Inhaltsseiten (Bereiche vom Typ "seite") */
+.bereich-inhalt {
+  max-width: 100%;
+  line-height: 1.6;
+}
+
+.bereich-inhalt img {
+  max-width: 100%;
+}
+
+.bereich-inhalt table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bereich-inhalt table td,
+.bereich-inhalt table th {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+}
