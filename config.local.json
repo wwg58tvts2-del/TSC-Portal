@@ -27,11 +27,6 @@
   },
   "bereiche": {
     "formBaseUrl": "https://tsc-form.m-wiesner.de",
-    "section": {
-      "kicker": "Vorstandsportal",
-      "title": "Angebote",
-      "intro": "Formulare und externe Anwendungen an einem Ort."
-    },
     "items": [
       {
         "id": "sharepoint-vorstand",

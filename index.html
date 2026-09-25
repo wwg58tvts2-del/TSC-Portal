@@ -100,10 +100,6 @@
       <p v-if="warnung" class="alert alert-warning" role="alert">{{ warnung }}</p>
 
       <section v-if="sichtbareBereiche.length" id="forms-section">
-        <div class="section-divider" aria-hidden="true"></div>
-        <p class="section-kicker">{{ config?.bereiche?.section?.kicker }}</p>
-        <h2 class="section-title">{{ config?.bereiche?.section?.title }}</h2>
-        <p class="section-intro">{{ config?.bereiche?.section?.intro }}</p>
         <div class="form-options" aria-live="polite">
           <article class="form-option" v-for="bereich in sichtbareBereiche" :key="bereich.id">
             <h2>{{ bereich.titel }}</h2>
