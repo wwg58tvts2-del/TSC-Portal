@@ -6,7 +6,7 @@ import {
   holeMemberStatus,
   sendeLogout,
   sendeFormularRequest
-} from "./api.js?v=20260926-section-config-1";
+} from "./api.js?v=20260926-flat-config-1";
 
 import {
   leseBereichIdAusUrl,
@@ -20,17 +20,24 @@ import {
 
 
 function normalisiereKonfiguration(konfiguration) {
-  const {bereiche, ...rest} = konfiguration;
-  const quellAreas = konfiguration.areas || bereiche || {};
+  const {
+    bereiche,
+    areas: nestedAreas,
+    apps: rootApps,
+    forms: rootForms,
+    formBaseUrl: rootFormBaseUrl,
+    pages: rootPages,
+    ...rest
+  } = konfiguration;
+  const quellAreas = nestedAreas || bereiche || {};
   const {
     items,
     applikationen,
     formulare,
-    apps: quellApps,
-    forms: quellForms,
-    pages: quellPages,
-    section: alteSection,
-    ...restAreas
+    apps: nestedApps,
+    forms: nestedForms,
+    pages: nestedPages,
+    section: alteSection
   } = quellAreas;
   const alteEintraege = Array.isArray(items) ? items : [];
   const istAltesFormular = (eintrag) =>
@@ -44,26 +51,29 @@ function normalisiereKonfiguration(konfiguration) {
   const alteSeiten = alteEintraege.filter(
     (eintrag) => !eintrag?.url && !istAltesFormular(eintrag)
   );
-  const appsObjekt = quellApps && !Array.isArray(quellApps) ? quellApps : {};
-  const formsObjekt = quellForms && !Array.isArray(quellForms) ? quellForms : {};
-  const apps = Array.isArray(quellApps)
-    ? quellApps
+  const appsDaten = rootApps ?? nestedApps ?? applikationen;
+  const formsDaten = rootForms ?? nestedForms ?? formulare;
+  const appsObjekt = appsDaten && !Array.isArray(appsDaten) ? appsDaten : {};
+  const formsObjekt = formsDaten && !Array.isArray(formsDaten) ? formsDaten : {};
+  const apps = Array.isArray(appsDaten)
+    ? appsDaten
     : Array.isArray(appsObjekt.items)
       ? appsObjekt.items
     : Array.isArray(applikationen)
       ? applikationen
       : alteApps;
-  const forms = Array.isArray(quellForms)
-    ? quellForms
+  const forms = Array.isArray(formsDaten)
+    ? formsDaten
     : Array.isArray(formsObjekt.items)
       ? formsObjekt.items
     : Array.isArray(formulare)
       ? formulare
       : alteForms;
-  const pages = Array.isArray(quellPages)
-    ? quellPages
-    : Array.isArray(quellPages?.items)
-      ? quellPages.items
+  const pagesDaten = rootPages ?? nestedPages;
+  const pages = Array.isArray(pagesDaten)
+    ? pagesDaten
+    : Array.isArray(pagesDaten?.items)
+      ? pagesDaten.items
     : alteSeiten;
 
   const normalisiereSection = (section) => {
@@ -126,20 +136,18 @@ function normalisiereKonfiguration(konfiguration) {
     memberLogin,
     memberLogout,
     footer,
-    areas: {
-      ...restAreas,
-      apps: {
-        ...appsObjekt,
-        section: normalisiereSection(appsObjekt.section || alteSection),
-        items: apps.map((eintrag) => normalisiereEintrag(eintrag, "app"))
-      },
-      forms: {
-        ...formsObjekt,
-        section: normalisiereSection(formsObjekt.section || alteSection),
-        items: forms.map((eintrag) => normalisiereEintrag(eintrag, "form"))
-      },
-      pages: pages.map((eintrag) => normalisiereEintrag(eintrag, "page"))
-    }
+    formBaseUrl: rootFormBaseUrl ?? quellAreas.formBaseUrl,
+    apps: {
+      ...appsObjekt,
+      section: normalisiereSection(appsObjekt.section || alteSection),
+      items: apps.map((eintrag) => normalisiereEintrag(eintrag, "app"))
+    },
+    forms: {
+      ...formsObjekt,
+      section: normalisiereSection(formsObjekt.section || alteSection),
+      items: forms.map((eintrag) => normalisiereEintrag(eintrag, "form"))
+    },
+    pages: pages.map((eintrag) => normalisiereEintrag(eintrag, "page"))
   };
 }
 
@@ -335,11 +343,10 @@ export const state = reactive({
 
 
   get bereichsEintraege() {
-    const areas = this.config?.areas || {};
     return [
-      ...(Array.isArray(areas.apps?.items) ? areas.apps.items : []),
-      ...(Array.isArray(areas.forms?.items) ? areas.forms.items : []),
-      ...(Array.isArray(areas.pages) ? areas.pages : [])
+      ...(Array.isArray(this.config?.apps?.items) ? this.config.apps.items : []),
+      ...(Array.isArray(this.config?.forms?.items) ? this.config.forms.items : []),
+      ...(Array.isArray(this.config?.pages) ? this.config.pages : [])
     ];
   },
 
@@ -577,7 +584,7 @@ export const state = reactive({
       this.selectedBereich;
 
     const baseUrl =
-      this.config?.areas?.formBaseUrl;
+      this.config?.formBaseUrl;
 
     if (!bereich || bereich.type !== "form" || !baseUrl) {
       return;

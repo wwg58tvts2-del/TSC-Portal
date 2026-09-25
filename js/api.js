@@ -96,8 +96,8 @@ export async function ladeConfigDaten(url) {
   console.log("JSON-Schlüssel:", Object.keys(result));
   const bereichsDaten = result.areas || result.bereiche || {};
   const legacyBereiche = Array.isArray(bereichsDaten.items) ? bereichsDaten.items : [];
-  const appsDaten = bereichsDaten.apps ?? bereichsDaten.applikationen;
-  const formsDaten = bereichsDaten.forms ?? bereichsDaten.formulare;
+  const appsDaten = result.apps ?? bereichsDaten.apps ?? bereichsDaten.applikationen;
+  const formsDaten = result.forms ?? bereichsDaten.forms ?? bereichsDaten.formulare;
   const appsItems = Array.isArray(appsDaten)
     ? appsDaten
     : Array.isArray(appsDaten?.items)

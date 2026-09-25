@@ -103,9 +103,9 @@
 
       <section v-if="sichtbareFormulare.length" id="forms-section">
         <div class="section-divider" aria-hidden="true"></div>
-        <p class="section-kicker">{{ config?.areas?.forms?.section?.kicker }}</p>
-        <h2 class="section-title">{{ config?.areas?.forms?.section?.title || 'Formulare' }}</h2>
-        <p class="section-intro">{{ config?.areas?.forms?.section?.intro }}</p>
+        <p class="section-kicker">{{ config?.forms?.section?.kicker }}</p>
+        <h2 class="section-title">{{ config?.forms?.section?.title || 'Formulare' }}</h2>
+        <p class="section-intro">{{ config?.forms?.section?.intro }}</p>
         <div class="form-options" aria-live="polite">
           <article class="form-option" v-for="bereich in sichtbareFormulare" :key="bereich.id">
             <h2>{{ bereich.title }}</h2>
@@ -120,9 +120,9 @@
 
       <section v-if="sichtbareApps.length" id="apps-section">
         <div class="section-divider" aria-hidden="true"></div>
-        <p class="section-kicker">{{ config?.areas?.apps?.section?.kicker }}</p>
-        <h2 class="section-title">{{ config?.areas?.apps?.section?.title || 'Apps' }}</h2>
-        <p class="section-intro">{{ config?.areas?.apps?.section?.intro }}</p>
+        <p class="section-kicker">{{ config?.apps?.section?.kicker }}</p>
+        <h2 class="section-title">{{ config?.apps?.section?.title || 'Apps' }}</h2>
+        <p class="section-intro">{{ config?.apps?.section?.intro }}</p>
         <div class="form-options" aria-live="polite">
           <article class="form-option" v-for="bereich in sichtbareApps" :key="bereich.id">
             <h2>{{ bereich.title }}</h2>
@@ -200,6 +200,7 @@
     </div>
   </div>
 
-  <script type="module" src="js/main.js?v=20260926-section-config-1"></script>
+  <script type="module" src="js/main.js?v=20260926-flat-config-1"></script>
+  <script type="module" src="js/main.js?v=20260926-flat-config-1"></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 # Vorstandsportal – Codepflege
 
-Stand: 26.09.2026, Version `20260926-section-config-1`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
+Stand: 26.09.2026, Version `20260926-flat-config-1`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
+Stand: 26.09.2026, Version `20260926-flat-config-1`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
 
 ## Architektur und Stil
 
@@ -10,10 +11,10 @@ Deutsche Namen und Modulgrenzen wie im Serviceportal beibehalten. Neue Aufrufe k
 
 ## Unterschied zum Serviceportal: Bereiche statt Formulare
 
-Die Startseite trennt die englische Konfiguration in `config.areas.forms` und `config.areas.apps`; beide Kategorien enthalten jeweils `section` (`kicker`, `title`, `intro`) und `items`:
+Die Startseite trennt die englische Root-Konfiguration in `config.forms` und `config.apps`; beide Kategorien enthalten jeweils `section` (`kicker`, `title`, `intro`) und `items`:
 
-- `areas.apps.items`: externe Webseiten mit `url`; sie erscheinen unter Apps.
-- `areas.forms.items`: Form.io-Formulare; sie erscheinen unter Formulare und werden über `config.areas.formBaseUrl` + `id` geladen.
+- `apps.items`: externe Webseiten mit `url`; sie erscheinen unter Apps.
+- `forms.items`: Form.io-Formulare; sie erscheinen unter Formulare und werden über `config.formBaseUrl` + `id` geladen.
 - Zur Migration werden die früheren deutschen Schlüssel und das alte `bereiche.items`-Array beim Laden normalisiert; eine `url` kennzeichnet darin einen App-Link, `typ: "formular"` ein Form.io-Formular.
 
 Sichtbarkeit läuft unabhängig vom Typ über `visibility` (Array von Gruppennamen oder `"all"`) gegen die Gruppen des angemeldeten Vorstandsmitglieds (`state.gruppen`). Das Portal verwendet `person.gruppen` oder ersatzweise die OIDC-App-Rollen `roles` aus `/webhook/oidc/me`.

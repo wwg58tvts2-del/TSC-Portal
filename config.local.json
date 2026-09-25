@@ -25,34 +25,32 @@
     "title": "Vereinsportal",
     "intro": "Dein zentraler Zugang zu Anwendungen, Dokumenten und Formularen."
   },
-  "areas": {
-    "formBaseUrl": "https://tsc-form.m-wiesner.de/form/",
-    "forms": {
-      "section": {
-        "kicker": "Formulare",
-        "title": "Formulare",
-        "intro": "Digitale Formulare für Anliegen rund um den Verein."
-      },
-      "items": []
+  "formBaseUrl": "https://tsc-form.m-wiesner.de/form/",
+  "forms": {
+    "section": {
+      "kicker": "Formulare",
+      "title": "Formulare",
+      "intro": "Digitale Formulare für Anliegen rund um den Verein."
     },
-    "apps": {
-      "section": {
-        "kicker": "Externe Angebote",
-        "title": "Apps",
-        "intro": "Direkt zu den digitalen Angeboten des Vereins."
-      },
-      "items": [
-        {
-          "id": "sharepoint-vorstand",
-          "title": "SharePoint Vorstand",
-          "description": "Ablage für gemeinsame Dokumente.",
-          "url": "https://example.sharepoint.com",
-          "openInNewWindow": true,
-          "visibility": ["all"],
-          "active": true
-        }
-      ]
-    }
+    "items": []
+  },
+  "apps": {
+    "section": {
+      "kicker": "Externe Angebote",
+      "title": "Apps",
+      "intro": "Direkt zu den digitalen Angeboten des Vereins."
+    },
+    "items": [
+      {
+        "id": "sharepoint-vorstand",
+        "title": "SharePoint Vorstand",
+        "description": "Ablage für gemeinsame Dokumente.",
+        "url": "https://example.sharepoint.com",
+        "openInNewWindow": true,
+        "visibility": ["all"],
+        "active": true
+      }
+    ]
   },
   "footer": [
     {

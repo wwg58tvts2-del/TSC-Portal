@@ -18,9 +18,8 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
   "memberStatusUrl": "/webhook/oidc/me",
   "memberLogout": { "webhookUrl": "/webhook/oidc/logout", "method": "POST", "loadingText": "Du wirst abgemeldet ..." },
   "body": { "kicker": "Willkommen", "title": "Vorstandsportal", "intro": "Interne Bereiche für den Vorstand." },
-  "areas": {
-    "formBaseUrl": "https://beispiel.form.io/vorstand",
-    "forms": {
+  "formBaseUrl": "https://beispiel.form.io/vorstand",
+  "forms": {
       "section": {
         "kicker": "Anträge und Anliegen",
         "title": "Formulare",
@@ -35,8 +34,8 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
           "active": true
         }
       ]
-    },
-    "apps": {
+  },
+  "apps": {
       "section": {
         "kicker": "Externe Angebote",
         "title": "Apps",
@@ -53,7 +52,6 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
           "active": true
         }
       ]
-    }
   },
   "onlineServices": { "section": {}, "items": [] },
   "downloads": { "section": {}, "items": [] },
@@ -63,7 +61,7 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
 
 `person.gruppen` oder ersatzweise `person.roles` (Array, aus `/webhook/oidc/me`) bestimmt, welche Bereiche sichtbar sind – Gruppennamen beziehungsweise App-Rollen kommen aus Azure AD/M365 und werden frei in n8n gepflegt.
 
-Einträge in `areas.forms.items` erscheinen unter **Formulare** und werden über `areas.formBaseUrl` plus `id` in Form.io geöffnet. Einträge in `areas.apps.items` erscheinen darunter als externe Links. `visibility` regelt unabhängig davon den Zugriff. Die Kicker, Titel und Intros der beiden Abschnitte werden über das jeweilige `section`-Objekt konfiguriert.
+Einträge in `forms.items` erscheinen unter **Formulare** und werden über `formBaseUrl` plus `id` in Form.io geöffnet. Einträge in `apps.items` erscheinen darunter als externe Links. `visibility` regelt unabhängig davon den Zugriff. Die Kicker, Titel und Intros der beiden Abschnitte werden über das jeweilige `section`-Objekt konfiguriert.
 
 Der Login startet über `/webhook/oidc`; `/webhook/oidc/me` liefert `{ angemeldet, person, csrfToken, expiresAt }`. Der API-Parser übernimmt die äußeren Sitzungswerte in das normalisierte Person-Objekt. Der Logout sendet `POST /webhook/oidc/logout` mit `credentials: "include"`, `cache: "no-store"` und dem Header `X-CSRF-Token`. `angemeldet: false` oder `authenticated: false` beendet den lokalen Anmeldestatus. Der Proxy muss `Cookie`, `Origin` und `X-CSRF-Token` an n8n weitergeben sowie `X-TSC-Cookie` serverseitig in `Set-Cookie` umwandeln und anschließend aus der Browserantwort entfernen. Token- und Cookie-Felder werden aus den Browser-Console-Logs redigiert.
 
