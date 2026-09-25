@@ -76,15 +76,24 @@ export const state = reactive({
   async ladeConfig() {
     console.log("[Vorstandsportal] ladeConfig() gestartet");
     try {
+      const konfigurationsQuelle =
+        await ladeConfigDaten(
+          "config.json"
+        );
+
+      const configUrl =
+        konfigurationsQuelle.configUrl ||
+        "/webhook/selfservice-config";
+
       try {
         this.config =
           await ladeConfigDaten(
-            "/webhook/vorstand-config"
+            configUrl
           );
       } catch (webhookError) {
         // Solange n8n den Endpunkt nicht bereitstellt, lokale Testdaten verwenden.
         console.warn(
-          "[Vorstandsportal] /webhook/vorstand-config nicht erreichbar, verwende config.local.json:",
+          `[Vereinsportal] ${configUrl} nicht erreichbar, verwende config.local.json:`,
           webhookError
         );
 
