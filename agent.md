@@ -1,6 +1,6 @@
 # Vorstandsportal – Codepflege
 
-Stand: 25.09.2026, Version `20260925-oidc-login-ui-1`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
+Stand: 25.09.2026, Version `20260925-oidc-login-ui-2`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
 
 ## Architektur und Stil
 

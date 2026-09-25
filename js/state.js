@@ -146,6 +146,12 @@ export const state = reactive({
   },
 
 
+  get logoutName() {
+    const name = this.person?.vorname || this.person?.name || "Vorstand";
+    return String(name).trim().split(/\s+/)[0] || "Vorstand";
+  },
+
+
   /*
    * M365-Gruppen des angemeldeten Vorstandsmitglieds. Frei konfigurierbar
    * über n8n/Azure AD, keine feste Werteliste wie im Serviceportal.
