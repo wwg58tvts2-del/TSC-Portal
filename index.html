@@ -118,7 +118,7 @@
       <div class="form-modal-backdrop" aria-hidden="true"></div>
       <div class="form-modal-dialog" role="dialog" aria-modal="true">
         <div class="form-modal-header">
-          <button v-if="person" id="back-button" class="btn btn-outline-secondary" type="button" @click="zurueck()">
+          <button id="back-button" class="btn btn-outline-secondary" type="button" @click="zurueck()">
             <i class="bi bi-arrow-left" aria-hidden="true"></i>
             Zurück
           </button>
@@ -132,7 +132,13 @@
       <div class="form-modal-backdrop" aria-hidden="true"></div>
       <div class="form-modal-dialog" role="dialog" aria-modal="true">
         <div class="form-modal-header">
-          <button id="back-button" class="btn btn-outline-secondary" type="button" @click="zurueck()">
+          <button
+            v-if="selectedBereich?.id !== config?.memberLogin?.id"
+            id="back-button"
+            class="btn btn-outline-secondary"
+            type="button"
+            @click="zurueck()"
+          >
             <i class="bi bi-arrow-left" aria-hidden="true"></i>
             Zurück
           </button>
