@@ -190,6 +190,10 @@ export const state = reactive({
 
 
   get sichtbareBereiche() {
+    if (!this.person) {
+      return [];
+    }
+
     const bereiche =
       Array.isArray(
         this.config?.bereiche?.items
@@ -238,6 +242,11 @@ export const state = reactive({
 
       this.person = person;
 
+      if (!person) {
+        this.oeffneAnmeldeformular();
+        return person;
+      }
+
       console.info(
         "[Vorstandsportal] Erkannte Gruppen:",
         this.gruppen
@@ -257,13 +266,17 @@ export const state = reactive({
       return person;
 
     } catch (error) {
-      console.error(
-        "Fehler beim Aufruf von /webhook/me:",
-        error
-      );
+        console.error(
+          "Fehler beim Aufruf von /webhook/me:",
+          error
+        );
 
       if (silent && (error.status === 401 || error.status === 403)) {
         this.person = null;
+      }
+
+      if (!this.person) {
+        this.oeffneAnmeldeformular();
       }
 
       if (!silent) {
@@ -283,23 +296,24 @@ export const state = reactive({
   },
 
 
-  /*
-   * Startet die Microsoft-365-Anmeldung. Solange n8n den OIDC-Flow noch
-   * nicht bereitstellt, wird nur ein Hinweis angezeigt (config.memberLogin.url fehlt).
-   */
-  login() {
-    const url = this.config?.memberLogin?.url;
+  oeffneAnmeldeformular() {
+    const login =
+      this.config?.memberLogin;
 
-    if (url) {
-      window.location.href = url;
+    if (!login?.id || !this.config?.bereiche?.formBaseUrl) {
+      this.warnung =
+        "Das Anmeldeformular konnte nicht konfiguriert werden.";
+
       return;
     }
 
-    this.zeigeMeldung(
-      "Anmeldung noch nicht verfügbar",
-      "Die Anmeldung mit Microsoft 365 wird in Kürze über n8n bereitgestellt.",
-      false
-    );
+    this.selectedBereich = {
+      ...login,
+      typ: "formular",
+      titel: login.titel || "Anmeldung"
+    };
+    this.view = "formular";
+    aktualisiereUrl(null);
   },
 
 
@@ -331,6 +345,10 @@ export const state = reactive({
       }
 
     } finally {
+      if (!this.person) {
+        this.oeffneAnmeldeformular();
+      }
+
       this.versteckeLadenIntern();
     }
   },
@@ -407,7 +425,18 @@ export const state = reactive({
       this.activeFormInstance =
         await ladeFormular(
           container,
-          formUrl
+          formUrl,
+          {
+            onSubmitDone: async () => {
+              await this.ladeMemberDaten({ silent: true });
+
+              if (this.person) {
+                this.selectedBereich = null;
+                this.view = "auswahl";
+                aktualisiereUrl(null);
+              }
+            }
+          }
         );
     } catch (error) {
       console.error(
@@ -429,6 +458,10 @@ export const state = reactive({
 
 
   behandleUrlBeimStart() {
+    if (!this.person) {
+      return;
+    }
+
     const bereichId =
       leseBereichIdAusUrl();
 

@@ -66,19 +66,9 @@
     <div
       class="header-actions"
       aria-label="Vorstandsbereich"
-      v-if="config?.memberLogin && config.memberLogin.active !== false"
+      v-if="person && config?.memberLogout"
     >
       <button
-        v-if="!person"
-        class="header-login-button"
-        type="button"
-        @click="login()"
-      >
-        <i class="bi bi-microsoft" aria-hidden="true"></i>
-        <span>{{ config.memberLogin.titel || 'Mit Microsoft 365 anmelden' }}</span>
-      </button>
-      <button
-        v-else
         class="header-login-button member-logout-button"
         type="button"
         @click="logout()"
@@ -128,7 +118,7 @@
       <div class="form-modal-backdrop" aria-hidden="true"></div>
       <div class="form-modal-dialog" role="dialog" aria-modal="true">
         <div class="form-modal-header">
-          <button id="back-button" class="btn btn-outline-secondary" type="button" @click="zurueck()">
+          <button v-if="person" id="back-button" class="btn btn-outline-secondary" type="button" @click="zurueck()">
             <i class="bi bi-arrow-left" aria-hidden="true"></i>
             Zurück
           </button>
