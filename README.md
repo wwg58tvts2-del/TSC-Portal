@@ -14,32 +14,46 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
 {
   "page": { "title": "Vorstandsportal", "favicon": "img/favicon.png" },
   "header": { "logo": "img/logo.png", "kicker": "Vorstand", "caption": "Internes Portal" },
-  "memberLogin": { "active": true, "titel": "Mit Microsoft 365 anmelden", "url": "/webhook/oidc" },
+  "memberLogin": { "active": true, "title": "Mit Microsoft 365 anmelden", "url": "/webhook/oidc" },
   "memberStatusUrl": "/webhook/oidc/me",
-  "memberLogout": { "webhookUrl": "/webhook/oidc/logout", "method": "POST", "ladeText": "Du wirst abgemeldet ..." },
+  "memberLogout": { "webhookUrl": "/webhook/oidc/logout", "method": "POST", "loadingText": "Du wirst abgemeldet ..." },
   "body": { "kicker": "Willkommen", "title": "Vorstandsportal", "intro": "Interne Bereiche für den Vorstand." },
-  "bereiche": {
+  "areas": {
     "formBaseUrl": "https://beispiel.form.io/vorstand",
-    "section": { "kicker": "Bereiche", "title": "Deine Bereiche", "intro": "" },
-    "items": [
-      {
-        "id": "protokolle",
-        "titel": "Sitzungsprotokolle",
-        "beschreibung": "Übersicht und Ablage der Protokolle.",
-        "typ": "seite",
-        "inhalt": "<p>Inhalt der Seite ...</p>",
-        "sichtbarkeit": ["vorstand"],
-        "active": true
+    "forms": {
+      "section": {
+        "kicker": "Anträge und Anliegen",
+        "title": "Formulare",
+        "intro": "Digitale Formulare für Anliegen rund um den Verein."
       },
-      {
-        "id": "spesenantrag",
-        "titel": "Spesenantrag",
-        "beschreibung": "Formular für Spesenabrechnungen.",
-        "typ": "formular",
-        "sichtbarkeit": ["vorstand", "kassenwart"],
-        "active": true
-      }
-    ]
+      "items": [
+        {
+          "id": "spesenantrag",
+          "title": "Spesenantrag",
+          "description": "Formular für Spesenabrechnungen.",
+          "visibility": ["vorstand", "kassenwart"],
+          "active": true
+        }
+      ]
+    },
+    "apps": {
+      "section": {
+        "kicker": "Externe Angebote",
+        "title": "Apps",
+        "intro": "Direkt zu den digitalen Angeboten des Vereins."
+      },
+      "items": [
+        {
+          "id": "sharepoint-vorstand",
+          "title": "SharePoint Vorstand",
+          "description": "Ablage für gemeinsame Dokumente.",
+          "url": "https://beispiel.sharepoint.com",
+          "openInNewWindow": true,
+          "visibility": ["vorstand"],
+          "active": true
+        }
+      ]
+    }
   },
   "onlineServices": { "section": {}, "items": [] },
   "downloads": { "section": {}, "items": [] },
@@ -48,6 +62,8 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
 ```
 
 `person.gruppen` oder ersatzweise `person.roles` (Array, aus `/webhook/oidc/me`) bestimmt, welche Bereiche sichtbar sind – Gruppennamen beziehungsweise App-Rollen kommen aus Azure AD/M365 und werden frei in n8n gepflegt.
+
+Einträge in `areas.forms.items` erscheinen unter **Formulare** und werden über `areas.formBaseUrl` plus `id` in Form.io geöffnet. Einträge in `areas.apps.items` erscheinen darunter als externe Links. `visibility` regelt unabhängig davon den Zugriff. Die Kicker, Titel und Intros der beiden Abschnitte werden über das jeweilige `section`-Objekt konfiguriert.
 
 Der Login startet über `/webhook/oidc`; `/webhook/oidc/me` liefert `{ angemeldet, person, csrfToken, expiresAt }`. Der API-Parser übernimmt die äußeren Sitzungswerte in das normalisierte Person-Objekt. Der Logout sendet `POST /webhook/oidc/logout` mit `credentials: "include"`, `cache: "no-store"` und dem Header `X-CSRF-Token`. `angemeldet: false` oder `authenticated: false` beendet den lokalen Anmeldestatus. Der Proxy muss `Cookie`, `Origin` und `X-CSRF-Token` an n8n weitergeben sowie `X-TSC-Cookie` serverseitig in `Set-Cookie` umwandeln und anschließend aus der Browserantwort entfernen. Token- und Cookie-Felder werden aus den Browser-Console-Logs redigiert.
 

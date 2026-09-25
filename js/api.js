@@ -94,7 +94,28 @@ export async function ladeConfigDaten(url) {
   }
 
   console.log("JSON-Schlüssel:", Object.keys(result));
-  console.log("Bereiche:", Array.isArray(result.bereiche?.items) ? result.bereiche.items.length : 0);
+  const bereichsDaten = result.areas || result.bereiche || {};
+  const legacyBereiche = Array.isArray(bereichsDaten.items) ? bereichsDaten.items : [];
+  const appsDaten = bereichsDaten.apps ?? bereichsDaten.applikationen;
+  const formsDaten = bereichsDaten.forms ?? bereichsDaten.formulare;
+  const appsItems = Array.isArray(appsDaten)
+    ? appsDaten
+    : Array.isArray(appsDaten?.items)
+      ? appsDaten.items
+      : null;
+  const formsItems = Array.isArray(formsDaten)
+    ? formsDaten
+    : Array.isArray(formsDaten?.items)
+      ? formsDaten.items
+      : null;
+  const anzahlApps = appsItems
+    ? appsItems.length
+    : legacyBereiche.filter((bereich) => bereich.url && bereich.typ !== "formular").length;
+  const anzahlFormulare = formsItems
+    ? formsItems.length
+    : legacyBereiche.filter((bereich) => bereich.typ === "formular").length;
+  console.log("Apps:", anzahlApps);
+  console.log("Formulare:", anzahlFormulare);
   console.log("Online-Services:", Array.isArray(result.onlineServices?.items) ? result.onlineServices.items.length : 0);
   console.log("Downloads:", Array.isArray(result.downloads?.items) ? result.downloads.items.length : 0);
   console.log("Footer-Links:", Array.isArray(result.footer) ? result.footer.length : 0);

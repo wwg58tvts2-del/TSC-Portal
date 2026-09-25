@@ -6,7 +6,7 @@ import {
   holeMemberStatus,
   sendeLogout,
   sendeFormularRequest
-} from "./api.js?v=20260926-m365-response-1";
+} from "./api.js?v=20260926-section-config-1";
 
 import {
   leseBereichIdAusUrl,
@@ -17,6 +17,131 @@ import {
   ladeFormular,
   zerstoereFormular
 } from "./formio.js?v=20260925-oidc-logout-1";
+
+
+function normalisiereKonfiguration(konfiguration) {
+  const {bereiche, ...rest} = konfiguration;
+  const quellAreas = konfiguration.areas || bereiche || {};
+  const {
+    items,
+    applikationen,
+    formulare,
+    apps: quellApps,
+    forms: quellForms,
+    pages: quellPages,
+    section: alteSection,
+    ...restAreas
+  } = quellAreas;
+  const alteEintraege = Array.isArray(items) ? items : [];
+  const istAltesFormular = (eintrag) =>
+    ["form", "formular"].includes(
+      String(eintrag?.type || eintrag?.typ || "").toLowerCase()
+    );
+  const alteApps = alteEintraege.filter(
+    (eintrag) => eintrag?.url && !istAltesFormular(eintrag)
+  );
+  const alteForms = alteEintraege.filter(istAltesFormular);
+  const alteSeiten = alteEintraege.filter(
+    (eintrag) => !eintrag?.url && !istAltesFormular(eintrag)
+  );
+  const appsObjekt = quellApps && !Array.isArray(quellApps) ? quellApps : {};
+  const formsObjekt = quellForms && !Array.isArray(quellForms) ? quellForms : {};
+  const apps = Array.isArray(quellApps)
+    ? quellApps
+    : Array.isArray(appsObjekt.items)
+      ? appsObjekt.items
+    : Array.isArray(applikationen)
+      ? applikationen
+      : alteApps;
+  const forms = Array.isArray(quellForms)
+    ? quellForms
+    : Array.isArray(formsObjekt.items)
+      ? formsObjekt.items
+    : Array.isArray(formulare)
+      ? formulare
+      : alteForms;
+  const pages = Array.isArray(quellPages)
+    ? quellPages
+    : Array.isArray(quellPages?.items)
+      ? quellPages.items
+    : alteSeiten;
+
+  const normalisiereSection = (section) => {
+    const quelle = section && typeof section === "object" ? section : {};
+    const {titel, ...restSection} = quelle;
+    return {
+      ...restSection,
+      title: quelle.title ?? titel ?? "",
+      kicker: quelle.kicker ?? "",
+      intro: quelle.intro ?? ""
+    };
+  };
+
+  const normalisiereEintrag = (eintrag, type) => {
+    const {
+      titel,
+      beschreibung,
+      sichtbarkeit,
+      neuesFenster,
+      inhalt,
+      typ,
+      ...restEintrag
+    } = eintrag || {};
+    const visibility = eintrag?.visibility ?? sichtbarkeit ?? "all";
+
+    return {
+      ...restEintrag,
+      type,
+      title: eintrag?.title ?? titel ?? "",
+      description: eintrag?.description ?? beschreibung ?? "",
+      visibility: Array.isArray(visibility)
+        ? visibility.map((gruppe) => String(gruppe).toLowerCase() === "alle" ? "all" : gruppe)
+        : String(visibility).toLowerCase() === "alle" ? "all" : visibility,
+      openInNewWindow: eintrag?.openInNewWindow ?? neuesFenster ?? false,
+      content: eintrag?.content ?? inhalt
+    };
+  };
+
+  const memberLogin = konfiguration.memberLogin
+    ? (({titel, ...login}) => ({
+        ...login,
+        title: konfiguration.memberLogin.title ?? titel ?? ""
+      }))(konfiguration.memberLogin)
+    : konfiguration.memberLogin;
+  const memberLogout = konfiguration.memberLogout
+    ? (({ladeText, ...logout}) => ({
+        ...logout,
+        loadingText: konfiguration.memberLogout.loadingText ?? ladeText
+      }))(konfiguration.memberLogout)
+    : konfiguration.memberLogout;
+  const footer = Array.isArray(konfiguration.footer)
+    ? konfiguration.footer.map(({titel, ...link}) => ({
+        ...link,
+        title: link.title ?? titel ?? ""
+      }))
+    : konfiguration.footer;
+
+  return {
+    ...rest,
+    memberLogin,
+    memberLogout,
+    footer,
+    areas: {
+      ...restAreas,
+      apps: {
+        ...appsObjekt,
+        section: normalisiereSection(appsObjekt.section || alteSection),
+        items: apps.map((eintrag) => normalisiereEintrag(eintrag, "app"))
+      },
+      forms: {
+        ...formsObjekt,
+        section: normalisiereSection(formsObjekt.section || alteSection),
+        items: forms.map((eintrag) => normalisiereEintrag(eintrag, "form"))
+      },
+      pages: pages.map((eintrag) => normalisiereEintrag(eintrag, "page"))
+    }
+  };
+}
 
 
 export const state = reactive({
@@ -103,6 +228,8 @@ export const state = reactive({
           );
       }
 
+      this.config = normalisiereKonfiguration(this.config);
+
       console.log("[Vorstandsportal] Konfiguration im State übernommen");
 
       document.title =
@@ -179,11 +306,11 @@ export const state = reactive({
 
   istBereichSichtbar(bereich) {
     const sichtbarkeit =
-      Array.isArray(bereich.sichtbarkeit)
-        ? bereich.sichtbarkeit
+      Array.isArray(bereich.visibility)
+        ? bereich.visibility
         : [
-            bereich.sichtbarkeit ||
-            "alle"
+            bereich.visibility ||
+            "all"
           ];
 
     const erlaubteGruppen =
@@ -195,6 +322,7 @@ export const state = reactive({
       );
 
     return (
+      erlaubteGruppen.includes("all") ||
       erlaubteGruppen.includes("alle") ||
       erlaubteGruppen.some(
         (gruppe) =>
@@ -206,22 +334,42 @@ export const state = reactive({
   },
 
 
+  get bereichsEintraege() {
+    const areas = this.config?.areas || {};
+    return [
+      ...(Array.isArray(areas.apps?.items) ? areas.apps.items : []),
+      ...(Array.isArray(areas.forms?.items) ? areas.forms.items : []),
+      ...(Array.isArray(areas.pages) ? areas.pages : [])
+    ];
+  },
+
+
   get sichtbareBereiche() {
     if (!this.person) {
       return [];
     }
 
-    const bereiche =
-      Array.isArray(
-        this.config?.bereiche?.items
-      )
-        ? this.config.bereiche.items
-        : [];
-
-    return bereiche.filter(
+    return this.bereichsEintraege.filter(
       (bereich) =>
         bereich.active !== false &&
         this.istBereichSichtbar(bereich)
+    );
+  },
+
+
+  get sichtbareApps() {
+    return this.sichtbareBereiche.filter(
+      (bereich) =>
+        typeof bereich.url === "string" &&
+        bereich.url.trim().length > 0 &&
+        bereich.type === "app"
+    );
+  },
+
+
+  get sichtbareFormulare() {
+    return this.sichtbareBereiche.filter(
+      (bereich) => bereich.type === "form"
     );
   },
 
@@ -337,7 +485,7 @@ export const state = reactive({
   async logout() {
     const config = this.config?.memberLogout || {};
 
-    this.zeigeLadenIntern(config.ladeText || "Du wirst abgemeldet ...");
+    this.zeigeLadenIntern(config.loadingText || "Du wirst abgemeldet ...");
 
     try {
       const result = await sendeLogout(config, this.person?.csrfToken);
@@ -396,7 +544,7 @@ export const state = reactive({
     this.warnung = "";
     this.selectedBereich = bereich;
     this.view =
-      bereich.typ === "formular"
+      bereich.type === "form"
         ? "formular"
         : "seite";
 
@@ -429,9 +577,9 @@ export const state = reactive({
       this.selectedBereich;
 
     const baseUrl =
-      this.config?.bereiche?.formBaseUrl;
+      this.config?.areas?.formBaseUrl;
 
-    if (!bereich || bereich.typ !== "formular" || !baseUrl) {
+    if (!bereich || bereich.type !== "form" || !baseUrl) {
       return;
     }
 
@@ -515,7 +663,7 @@ export const state = reactive({
 
     this.selectedBereich = bereich;
     this.view =
-      bereich.typ === "formular"
+      bereich.type === "form"
         ? "formular"
         : "seite";
   },
@@ -549,24 +697,18 @@ export const state = reactive({
 
     this.selectedBereich = bereich;
     this.view =
-      bereich.typ === "formular"
+      bereich.type === "form"
         ? "formular"
         : "seite";
   },
 
 
   findeBereich(bereichId) {
-    const bereiche =
-      Array.isArray(
-        this.config?.bereiche?.items
-      )
-        ? this.config.bereiche.items
-        : [];
-
-    return bereiche.find(
+    return this.bereichsEintraege.find(
       (item) =>
         item.id === bereichId &&
-        item.typ !== "extern"
+        item.type !== "app" &&
+        !item.url
     );
   },
 

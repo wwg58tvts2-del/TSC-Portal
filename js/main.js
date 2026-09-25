@@ -1,5 +1,5 @@
 import {createApp} from "https://unpkg.com/petite-vue?module";
-import {state} from "./state.js?v=20260926-m365-response-1";
+import {state} from "./state.js?v=20260926-section-config-1";
 
 
 window.showMsgBox = (titel, inhalt, zurueckNachSchliessen, options = {}) =>

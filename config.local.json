@@ -11,42 +11,57 @@
   },
   "memberLogin": {
     "active": true,
-    "titel": "Mit Microsoft 365 anmelden",
+    "title": "Mit Microsoft 365 anmelden",
     "url": "/webhook/oidc"
   },
   "memberStatusUrl": "/webhook/oidc/me",
   "memberLogout": {
     "webhookUrl": "/webhook/oidc/logout",
     "method": "POST",
-    "ladeText": "Du wirst abgemeldet ..."
+    "loadingText": "Du wirst abgemeldet ..."
   },
   "body": {
     "kicker": "Willkommen",
     "title": "Vereinsportal",
     "intro": "Dein zentraler Zugang zu Anwendungen, Dokumenten und Formularen."
   },
-  "bereiche": {
+  "areas": {
     "formBaseUrl": "https://tsc-form.m-wiesner.de/form/",
-    "items": [
-      {
-        "id": "sharepoint-vorstand",
-        "titel": "SharePoint Vorstand",
-        "beschreibung": "Ablage für gemeinsame Dokumente.",
-        "typ": "alle",
-        "url": "https://example.sharepoint.com",
-        "neuesFenster": true,
-        "active": true
-      }
-    ]
+    "forms": {
+      "section": {
+        "kicker": "Formulare",
+        "title": "Formulare",
+        "intro": "Digitale Formulare für Anliegen rund um den Verein."
+      },
+      "items": []
+    },
+    "apps": {
+      "section": {
+        "kicker": "Externe Angebote",
+        "title": "Apps",
+        "intro": "Direkt zu den digitalen Angeboten des Vereins."
+      },
+      "items": [
+        {
+          "id": "sharepoint-vorstand",
+          "title": "SharePoint Vorstand",
+          "description": "Ablage für gemeinsame Dokumente.",
+          "url": "https://example.sharepoint.com",
+          "openInNewWindow": true,
+          "visibility": ["all"],
+          "active": true
+        }
+      ]
+    }
   },
   "footer": [
     {
-      "titel": "Impressum",
+      "title": "Impressum",
       "url": "https://example.com/impressum",
       "active": true
     },
     {
-      "titel": "Datenschutz",
+      "title": "Datenschutz",
       "url": "https://example.com/datenschutz",
       "active": true
     }

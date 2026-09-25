@@ -88,7 +88,7 @@
       <p v-if="warnung" class="alert alert-warning" role="alert">{{ warnung }}</p>
       <button class="portal-login-button" type="button" @click="login()">
         <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
-        <span>{{ config?.memberLogin?.titel || 'Mit Microsoft 365 anmelden' }}</span>
+        <span>{{ config?.memberLogin?.title || 'Mit Microsoft 365 anmelden' }}</span>
       </button>
     </section>
 
@@ -101,25 +101,41 @@
 
       <p v-if="warnung" class="alert alert-warning" role="alert">{{ warnung }}</p>
 
-      <section v-if="sichtbareBereiche.length" id="forms-section">
+      <section v-if="sichtbareFormulare.length" id="forms-section">
+        <div class="section-divider" aria-hidden="true"></div>
+        <p class="section-kicker">{{ config?.areas?.forms?.section?.kicker }}</p>
+        <h2 class="section-title">{{ config?.areas?.forms?.section?.title || 'Formulare' }}</h2>
+        <p class="section-intro">{{ config?.areas?.forms?.section?.intro }}</p>
         <div class="form-options" aria-live="polite">
-          <article class="form-option" v-for="bereich in sichtbareBereiche" :key="bereich.id">
-            <h2>{{ bereich.titel }}</h2>
-            <p>{{ bereich.beschreibung }}</p>
+          <article class="form-option" v-for="bereich in sichtbareFormulare" :key="bereich.id">
+            <h2>{{ bereich.title }}</h2>
+            <p>{{ bereich.description }}</p>
+            <button class="form-button-label" type="button" @click="oeffneBereich(bereich)">
+              Formular öffnen
+              <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <section v-if="sichtbareApps.length" id="apps-section">
+        <div class="section-divider" aria-hidden="true"></div>
+        <p class="section-kicker">{{ config?.areas?.apps?.section?.kicker }}</p>
+        <h2 class="section-title">{{ config?.areas?.apps?.section?.title || 'Apps' }}</h2>
+        <p class="section-intro">{{ config?.areas?.apps?.section?.intro }}</p>
+        <div class="form-options" aria-live="polite">
+          <article class="form-option" v-for="bereich in sichtbareApps" :key="bereich.id">
+            <h2>{{ bereich.title }}</h2>
+            <p>{{ bereich.description }}</p>
             <a
-              v-if="bereich.typ === 'extern'"
               class="service-button"
               :href="bereich.url"
-              :target="bereich.neuesFenster ? '_blank' : '_self'"
-              :rel="bereich.neuesFenster ? 'noopener noreferrer' : null"
+              :target="bereich.openInNewWindow ? '_blank' : '_self'"
+              :rel="bereich.openInNewWindow ? 'noopener noreferrer' : null"
             >
               Öffnen
               <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
             </a>
-            <button v-else class="form-button-label" type="button" @click="oeffneBereich(bereich)">
-              {{ bereich.typ === 'formular' ? 'Formular öffnen' : 'Seite öffnen' }}
-              <i class="bi bi-arrow-right" aria-hidden="true"></i>
-            </button>
           </article>
         </div>
       </section>
@@ -135,8 +151,8 @@
             Zurück
           </button>
         </div>
-        <h1 class="visually-hidden">{{ selectedBereich?.titel }}</h1>
-        <div class="bereich-inhalt" v-html="selectedBereich?.inhalt"></div>
+        <h1 class="visually-hidden">{{ selectedBereich?.title }}</h1>
+        <div class="bereich-inhalt" v-html="selectedBereich?.content"></div>
       </div>
     </section>
 
@@ -149,7 +165,7 @@
             Zurück
           </button>
         </div>
-        <h1 class="visually-hidden">{{ selectedBereich?.titel }}</h1>
+        <h1 class="visually-hidden">{{ selectedBereich?.title }}</h1>
         <div id="formio" v-effect="ladeFormioEffect()"></div>
       </div>
     </section>
@@ -164,7 +180,7 @@
         :href="link.url"
         target="_blank"
         rel="noopener noreferrer"
-      >{{ link.titel }}</a>
+      >{{ link.title }}</a>
     </nav>
   </footer>
 
@@ -184,6 +200,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/main.js?v=20260926-m365-response-1"></script>
+  <script type="module" src="js/main.js?v=20260926-section-config-1"></script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 # Vorstandsportal – Codepflege
 
-Stand: 26.09.2026, Version `20260926-m365-response-1`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
+Stand: 26.09.2026, Version `20260926-section-config-1`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
 
 ## Architektur und Stil
 
@@ -10,12 +10,13 @@ Deutsche Namen und Modulgrenzen wie im Serviceportal beibehalten. Neue Aufrufe k
 
 ## Unterschied zum Serviceportal: Bereiche statt Formulare
 
-Statt einer festen Formularliste liefert n8n konfigurierbare **Bereiche** (`config.bereiche.items`), die der Vorstand selbst pflegt. Jeder Bereich hat einen `typ`:
+Die Startseite trennt die englische Konfiguration in `config.areas.forms` und `config.areas.apps`; beide Kategorien enthalten jeweils `section` (`kicker`, `title`, `intro`) und `items`:
 
-- `"seite"`: statische Inhaltsseite. `bereich.inhalt` enthält HTML, das per `v-html` gerendert wird (Klasse `bereich-inhalt`, siehe `css/bereiche.css`). Der Inhalt gilt als vertrauenswürdig, da er ausschließlich vom Vorstand über n8n gepflegt wird – keine Nutzereingaben werden hier gerendert.
-- `"formular"`: Form.io-Formular, analog zum Serviceportal. Wird über `config.bereiche.formBaseUrl` + `bereich.id` geladen.
+- `areas.apps.items`: externe Webseiten mit `url`; sie erscheinen unter Apps.
+- `areas.forms.items`: Form.io-Formulare; sie erscheinen unter Formulare und werden über `config.areas.formBaseUrl` + `id` geladen.
+- Zur Migration werden die früheren deutschen Schlüssel und das alte `bereiche.items`-Array beim Laden normalisiert; eine `url` kennzeichnet darin einen App-Link, `typ: "formular"` ein Form.io-Formular.
 
-Sichtbarkeit läuft über `bereich.sichtbarkeit` (Array von Gruppennamen oder `"alle"`) gegen die Gruppen des angemeldeten Vorstandsmitglieds (`state.gruppen`). Das Portal verwendet `person.gruppen` oder ersatzweise die OIDC-App-Rollen `roles` aus `/webhook/oidc/me`.
+Sichtbarkeit läuft unabhängig vom Typ über `visibility` (Array von Gruppennamen oder `"all"`) gegen die Gruppen des angemeldeten Vorstandsmitglieds (`state.gruppen`). Das Portal verwendet `person.gruppen` oder ersatzweise die OIDC-App-Rollen `roles` aus `/webhook/oidc/me`.
 
 `onlineServices`, `downloads` und `footer` funktionieren unverändert wie im Serviceportal (externe Links, Downloads, Footer-Links).
 
@@ -36,4 +37,4 @@ Identisch zum Serviceportal: `window.sendeFormular(instance, config)`, Servertex
 
 - `/webhook/vorstand-config` und die OIDC-Endpunkte in n8n müssen in der Produktivumgebung veröffentlicht und in der Portal-Konfiguration eingetragen sein.
 - Rechte-/Gruppenmodell (welche M365-Gruppe = welche Portalgruppe) wird in n8n gepflegt, nicht im Frontend.
-- Kein eigenes CMS für `bereich.inhalt` – HTML wird direkt in der n8n-Konfiguration hinterlegt.
+- Kein eigenes CMS für `area.content` – HTML wird direkt in der n8n-Konfiguration hinterlegt.
