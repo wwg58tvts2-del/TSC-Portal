@@ -26,7 +26,7 @@
     "intro": "Zentrale Formulare und externe Anwendungen für den Vorstand."
   },
   "bereiche": {
-    "formBaseUrl": "https://tsc-form.m-wiesner.de",
+    "formBaseUrl": "https://tsc-form.m-wiesner.de/form/",
     "items": [
       {
         "id": "sharepoint-vorstand",
