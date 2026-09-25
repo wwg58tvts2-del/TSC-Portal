@@ -1,6 +1,6 @@
 # Vorstandsportal
 
-Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (petite-vue, Bootstrap, Form.io), Backend/Konfiguration und künftig die Anmeldung per Microsoft 365 (OIDC) laufen über n8n. Architektur und Konventionen sind in [agent.md](agent.md) beschrieben.
+Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (petite-vue, Bootstrap, Form.io), Backend/Konfiguration und Microsoft-365-Anmeldung (OIDC) laufen über n8n. Architektur und Konventionen sind in [agent.md](agent.md) beschrieben.
 
 ## Struktur
 
@@ -14,8 +14,9 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
 {
   "page": { "title": "Vorstandsportal", "favicon": "img/favicon.png" },
   "header": { "logo": "img/logo.png", "kicker": "Vorstand", "caption": "Internes Portal" },
-  "memberLogin": { "active": true, "titel": "Mit Microsoft 365 anmelden", "url": null },
-  "memberLogout": { "webhookUrl": "/webhook/logout", "method": "GET", "ladeText": "Du wirst abgemeldet ..." },
+  "memberLogin": { "active": true, "titel": "Mit Microsoft 365 anmelden", "url": "/webhook/oidc" },
+  "memberStatusUrl": "/webhook/oidc/me",
+  "memberLogout": { "webhookUrl": "/webhook/oidc/logout", "method": "POST", "ladeText": "Du wirst abgemeldet ..." },
   "body": { "kicker": "Willkommen", "title": "Vorstandsportal", "intro": "Interne Bereiche für den Vorstand." },
   "bereiche": {
     "formBaseUrl": "https://beispiel.form.io/vorstand",
@@ -46,4 +47,8 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
 }
 ```
 
-`person.gruppen` (Array, aus `/webhook/me`) bestimmt, welche Bereiche sichtbar sind – Gruppennamen kommen aus Azure AD/M365 und werden frei in n8n gepflegt.
+`person.gruppen` oder ersatzweise `person.roles` (Array, aus `/webhook/oidc/me`) bestimmt, welche Bereiche sichtbar sind – Gruppennamen beziehungsweise App-Rollen kommen aus Azure AD/M365 und werden frei in n8n gepflegt.
+
+Der Login startet über `/webhook/oidc`; `/webhook/oidc/me` liefert die Person einschließlich `csrfToken`. Der Logout sendet `POST /webhook/oidc/logout` mit `credentials: "include"`, `cache: "no-store"` und dem Header `X-CSRF-Token`. Eine erfolgreiche Antwort mit `authenticated: false` entfernt den lokalen Anmeldestatus. Der Proxy muss `Cookie`, `Origin` und `X-CSRF-Token` an n8n weitergeben sowie `X-TSC-Cookie` serverseitig in `Set-Cookie` umwandeln und anschließend aus der Browserantwort entfernen.
+
+Die Portal-Loginansicht sammelt keine Zugangsdaten und verwendet kein Form.io. Ihr Button leitet zum konfigurierten `memberLogin.url` oder standardmäßig zu `/webhook/oidc` weiter; Form.io bleibt den eigentlichen Portalformularen vorbehalten.

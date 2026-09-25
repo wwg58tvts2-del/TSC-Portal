@@ -3,6 +3,56 @@
   margin: 0 auto;
 }
 
+.portal-login {
+  max-width: 900px;
+  margin: 46px auto 0;
+}
+
+.portal-login-heading {
+  margin: 4px 0 26px;
+  padding: 6px 4px 18px;
+  border-bottom: 2px solid #8b0000;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.portal-login-heading h1 {
+  margin: 0;
+  color: #222222;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.portal-login-heading p {
+  margin: 8px 0 0;
+  color: #666666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.portal-login-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 10px 16px;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: var(--club-red);
+  border: 1px solid var(--club-red);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.portal-login-button:hover,
+.portal-login-button:focus-visible {
+  background: var(--club-red-dark);
+  border-color: var(--club-red-dark);
+}
+
 #body-section {
   max-width: 900px;
   margin: 46px auto 0;

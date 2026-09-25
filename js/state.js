@@ -6,23 +6,23 @@ import {
   holeMemberStatus,
   sendeLogout,
   sendeFormularRequest
-} from "./api.js?v=20260924-init-1";
+} from "./api.js?v=20260925-oidc-logout-1";
 
 import {
   leseBereichIdAusUrl,
   aktualisiereUrl
-} from "./navigation.js?v=20260924-init-1";
+} from "./navigation.js?v=20260925-oidc-logout-1";
 
 import {
   ladeFormular,
   zerstoereFormular
-} from "./formio.js?v=20260924-init-1";
+} from "./formio.js?v=20260925-oidc-logout-1";
 
 
 export const state = reactive({
   config: null,
   person: null,
-  view: "auswahl",
+  view: "login",
   selectedBereich: null,
   activeFormInstance: null,
   warnung: "",
@@ -125,7 +125,7 @@ export const state = reactive({
         hatSichtbarenCookie()
       );
 
-      // /webhook/me immer abwarten,
+      // /webhook/oidc/me immer abwarten,
       // damit Login-Status vor Bereichs-
       // und Header-Anzeige feststeht
       await this.ladeMemberDaten({
@@ -158,7 +158,9 @@ export const state = reactive({
     const liste =
       Array.isArray(this.person.gruppen)
         ? this.person.gruppen
-        : [this.person.gruppe || "gast"];
+        : Array.isArray(this.person.roles)
+          ? this.person.roles
+          : [this.person.gruppe || "gast"];
 
     const bereinigt =
       liste
@@ -247,13 +249,19 @@ export const state = reactive({
 
     try {
       const person =
-        await holeMemberStatus();
+        await holeMemberStatus(
+          this.config?.memberStatusUrl
+        );
 
       this.person = person;
 
       if (!person) {
-        this.oeffneAnmeldeformular();
+        this.zeigeAnmeldung();
         return person;
+      }
+
+      if (this.view === "login") {
+        this.view = "auswahl";
       }
 
       console.info(
@@ -276,7 +284,7 @@ export const state = reactive({
 
     } catch (error) {
         console.error(
-          "Fehler beim Aufruf von /webhook/me:",
+          "Fehler beim Aufruf von /webhook/oidc/me:",
           error
         );
 
@@ -285,12 +293,12 @@ export const state = reactive({
       }
 
       if (!this.person) {
-        this.oeffneAnmeldeformular();
+        this.zeigeAnmeldung();
       }
 
       if (!silent) {
         this.zeigeMeldung(
-          "/webhook/me fehlgeschlagen",
+          "/webhook/oidc/me fehlgeschlagen",
           error.message ||
             "Der Anmeldestatus konnte nicht geprüft werden.",
           false
@@ -305,23 +313,17 @@ export const state = reactive({
   },
 
 
-  oeffneAnmeldeformular() {
-    const login =
-      this.config?.memberLogin;
+  login() {
+    const url = this.config?.memberLogin?.url || "/webhook/oidc";
+    window.location.assign(url);
+  },
 
-    if (!login?.id || !this.config?.bereiche?.formBaseUrl) {
-      this.warnung =
-        "Das Anmeldeformular konnte nicht konfiguriert werden.";
 
-      return;
-    }
-
-    this.selectedBereich = {
-      ...login,
-      typ: "formular",
-      titel: login.titel || "Anmeldung"
-    };
-    this.view = "formular";
+  zeigeAnmeldung() {
+    this.zerstoereFormio();
+    this.selectedBereich = null;
+    this.view = "login";
+    this.warnung = "";
     aktualisiereUrl(null);
   },
 
@@ -332,9 +334,13 @@ export const state = reactive({
     this.zeigeLadenIntern(config.ladeText || "Du wirst abgemeldet ...");
 
     try {
-      const result = await sendeLogout(config);
+      const result = await sendeLogout(config, this.person?.csrfToken);
 
-      if (result.erfolgreich === true || result.status === "nicht_angemeldet") {
+      if (
+        result.erfolgreich === true ||
+        result.status === "nicht_angemeldet" ||
+        result.authenticated === false
+      ) {
         this.person = null;
       }
 
@@ -355,7 +361,7 @@ export const state = reactive({
 
     } finally {
       if (!this.person) {
-        this.oeffneAnmeldeformular();
+        this.zeigeAnmeldung();
       }
 
       this.versteckeLadenIntern();
@@ -505,6 +511,11 @@ export const state = reactive({
 
 
   behandlePopState() {
+    if (!this.person) {
+      this.zeigeAnmeldung();
+      return;
+    }
+
     const bereichId =
       leseBereichIdAusUrl();
 

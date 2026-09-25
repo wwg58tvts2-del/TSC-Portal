@@ -85,8 +85,8 @@ export async function ladeConfigDaten(url) {
   return result;
 }
 
-export async function holeMemberStatus() {
-  const response = await fetch("/webhook/me", {
+export async function holeMemberStatus(url) {
+  const response = await fetch(url, {
     method: "GET",
     credentials: "include",
     cache: "no-store"
@@ -97,7 +97,7 @@ export async function holeMemberStatus() {
     ? await response.json()
     : await response.text();
 
-  loggeResponse("/webhook/me", response, result);
+  loggeResponse(url, response, result);
 
   if (response.status === 401 || response.status === 403) {
     return null;
@@ -112,8 +112,11 @@ export async function holeMemberStatus() {
   }
 
   const daten = Array.isArray(result) ? result[0] : result;
-  const person = daten?.person;
-  const gefunden = daten?.gefunden === true || daten?.erfolgreich === true;
+  const person = daten?.person || (daten?.authenticated === true ? daten : null);
+  const gefunden =
+    daten?.authenticated === true ||
+    daten?.gefunden === true ||
+    daten?.erfolgreich === true;
   const nichtAngemeldet = daten?.status === "fehlender_coockie"
     || daten?.status === "fehlender_cookie"
     || daten?.status === "nicht_angemeldet";
@@ -125,17 +128,32 @@ export async function holeMemberStatus() {
   return person;
 }
 
-export async function sendeLogout(config = {}) {
-  const webhookUrl = config.webhookUrl || "/webhook/logout";
-  const method = config.method || "GET";
+export async function sendeLogout(config = {}, csrfToken) {
+  const webhookUrl = config.webhookUrl || "/webhook/oidc/logout";
+  const method = String(config.method || "POST").toUpperCase();
+
+  if (method !== "POST") {
+    throw new Error("Der OIDC-Logout muss per POST erfolgen.");
+  }
+
+  if (typeof csrfToken !== "string" || !csrfToken.trim()) {
+    throw new Error("Das CSRF-Token für den Logout fehlt.");
+  }
 
   const response = await fetch(webhookUrl, {
     method,
     credentials: "include",
-    cache: "no-store"
+    cache: "no-store",
+    headers: {
+      "Accept": "application/json",
+      "X-CSRF-Token": csrfToken
+    }
   });
 
-  const result = await response.json();
+  const contentType = response.headers.get("content-type") || "";
+  const result = contentType.includes("application/json")
+    ? await response.json()
+    : await response.text();
   loggeResponse(webhookUrl, response, result);
 
   if (!response.ok) {
@@ -144,7 +162,17 @@ export async function sendeLogout(config = {}) {
     throw error;
   }
 
-  if (!result || typeof result.erfolgreich !== "boolean") {
+  const gueltigeAntwort =
+    result &&
+    typeof result === "object" &&
+    !Array.isArray(result) &&
+    (
+      typeof result.erfolgreich === "boolean" ||
+      result.authenticated === false ||
+      result.status === "nicht_angemeldet"
+    );
+
+  if (!gueltigeAntwort) {
     const error = new Error("Ungültige JSON-Antwort.");
     error.result = result;
     throw error;

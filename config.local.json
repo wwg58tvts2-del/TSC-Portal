@@ -12,12 +12,12 @@
   "memberLogin": {
     "active": true,
     "titel": "Mit Microsoft 365 anmelden",
-    "id": "6ab664ccdfd80249329e43b0",
-    "url": null
+    "url": "/webhook/oidc"
   },
+  "memberStatusUrl": "/webhook/oidc/me",
   "memberLogout": {
-    "webhookUrl": "/webhook/logout",
-    "method": "GET",
+    "webhookUrl": "/webhook/oidc/logout",
+    "method": "POST",
     "ladeText": "Du wirst abgemeldet ..."
   },
   "body": {
@@ -32,7 +32,7 @@
         "id": "sharepoint-vorstand",
         "titel": "SharePoint Vorstand",
         "beschreibung": "Ablage für gemeinsame Dokumente.",
-        "typ": "extern",
+        "typ": "alle",
         "url": "https://example.sharepoint.com",
         "neuesFenster": true,
         "active": true
