@@ -34,13 +34,13 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.min.css"
   >
 
+  <link rel="stylesheet" href="css/main.css">
+
   <!-- Form.io -->
   <link
     rel="stylesheet"
     href="https://cdn.form.io/js/formio.form.min.css"
   >
-
-  <link rel="stylesheet" href="css/main.css">
 
   <script
     src="https://cdn.form.io/js/formio.form.min.js"
@@ -108,7 +108,17 @@
           <article class="form-option" v-for="bereich in sichtbareBereiche" :key="bereich.id">
             <h2>{{ bereich.titel }}</h2>
             <p>{{ bereich.beschreibung }}</p>
-            <button class="form-button-label" type="button" @click="oeffneBereich(bereich)">
+            <a
+              v-if="bereich.typ === 'extern'"
+              class="service-button"
+              :href="bereich.url"
+              :target="bereich.neuesFenster ? '_blank' : '_self'"
+              :rel="bereich.neuesFenster ? 'noopener noreferrer' : null"
+            >
+              Öffnen
+              <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+            </a>
+            <button v-else class="form-button-label" type="button" @click="oeffneBereich(bereich)">
               {{ bereich.typ === 'formular' ? 'Formular öffnen' : 'Seite öffnen' }}
               <i class="bi bi-arrow-right" aria-hidden="true"></i>
             </button>
@@ -116,44 +126,6 @@
         </div>
       </section>
 
-      <section v-if="sichtbareServices.length" id="services-section">
-        <div class="section-divider" aria-hidden="true"></div>
-        <p class="section-kicker">{{ config?.onlineServices?.section?.kicker }}</p>
-        <h2 class="section-title">{{ config?.onlineServices?.section?.title }}</h2>
-        <p class="section-intro">{{ config?.onlineServices?.section?.intro }}</p>
-        <div class="form-options service-options" aria-live="polite">
-          <article class="form-option service-option" v-for="service in sichtbareServices" :key="service.url">
-            <h2>{{ service.titel }}</h2>
-            <p>{{ service.beschreibung }}</p>
-            <a
-              class="service-button"
-              :href="service.url"
-              :target="service.neuesFenster ? '_blank' : '_self'"
-              :rel="service.neuesFenster ? 'noopener noreferrer' : null"
-            >
-              Öffnen
-              <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-            </a>
-          </article>
-        </div>
-      </section>
-
-      <section v-if="sichtbareDownloads.length" id="downloads-section">
-        <div class="section-divider" aria-hidden="true"></div>
-        <p class="section-kicker">{{ config?.downloads?.section?.kicker }}</p>
-        <h2 class="section-title">{{ config?.downloads?.section?.title }}</h2>
-        <p class="section-intro">{{ config?.downloads?.section?.intro }}</p>
-        <div class="form-options download-options" aria-live="polite">
-          <article class="form-option download-option" v-for="download in sichtbareDownloads" :key="download.url">
-            <h2>{{ download.titel }}</h2>
-            <p>{{ download.beschreibung }}</p>
-            <a class="download-button" :href="download.url" target="_blank" rel="noopener noreferrer">
-              <i class="bi bi-download" aria-hidden="true"></i>
-              Download
-            </a>
-          </article>
-        </div>
-      </section>
     </section>
 
     <section v-else-if="view === 'seite'" id="page-container" class="form-modal">

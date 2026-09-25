@@ -205,36 +205,6 @@ export const state = reactive({
   },
 
 
-  get sichtbareServices() {
-    const services =
-      Array.isArray(
-        this.config?.onlineServices?.items
-      )
-        ? this.config.onlineServices.items
-        : [];
-
-    return services.filter(
-      (service) =>
-        service.active !== false
-    );
-  },
-
-
-  get sichtbareDownloads() {
-    const downloads =
-      Array.isArray(
-        this.config?.downloads?.items
-      )
-        ? this.config.downloads.items
-        : [];
-
-    return downloads.filter(
-      (download) =>
-        download.active !== false
-    );
-  },
-
-
   get sichtbareFooterLinks() {
     const links =
       Array.isArray(
@@ -437,17 +407,8 @@ export const state = reactive({
       this.activeFormInstance =
         await ladeFormular(
           container,
-          formUrl,
-          {
-            onSubmitDone: () => {
-              window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-              });
-            }
-          }
+          formUrl
         );
-
     } catch (error) {
       console.error(
         "Der Bereich konnte nicht geladen werden:",
@@ -540,7 +501,8 @@ export const state = reactive({
 
     return bereiche.find(
       (item) =>
-        item.id === bereichId
+        item.id === bereichId &&
+        item.typ !== "extern"
     );
   },
 

@@ -1,75 +1,59 @@
 {
-  "page": { "title": "Vorstandsportal (lokaler Test)", "favicon": "img/favicon.png" },
+  "page": {
+    "title": "Vorstandsportal (lokaler Test)",
+    "favicon": "img/favicon.png"
+  },
   "header": {
     "logo": "img/Logo_ohne_Noten_transparenter_Hintergrund-1.png",
     "logoAlt": "Tanzsportclub Dortmund",
     "kicker": "Vorstand",
     "caption": "Internes Portal – lokale Testdaten"
   },
-  "memberLogin": { "active": true, "titel": "Mit Microsoft 365 anmelden", "url": null },
-  "memberLogout": { "webhookUrl": "/webhook/logout", "method": "GET", "ladeText": "Du wirst abgemeldet ..." },
+  "memberLogin": {
+    "active": true,
+    "titel": "Mit Microsoft 365 anmelden",
+    "id": "6ab658f033fdeab1357429c8",
+    "url": null
+  },
+  "memberLogout": {
+    "webhookUrl": "/webhook/logout",
+    "method": "GET",
+    "ladeText": "Du wirst abgemeldet ..."
+  },
   "body": {
     "kicker": "Willkommen",
     "title": "Vorstandsportal",
-    "intro": "Interne Bereiche für den Vorstand. Diese Ansicht nutzt lokale Testdaten aus config.local.json."
+    "intro": "Zentrale Formulare und externe Anwendungen für den Vorstand."
   },
   "bereiche": {
-    "formBaseUrl": "https://beispiel.form.io/vorstand",
-    "section": { "kicker": "Bereiche", "title": "Deine Bereiche", "intro": "" },
+    "formBaseUrl": "https://tsc-form.m-wiesner.de",
+    "section": {
+      "kicker": "Vorstandsportal",
+      "title": "Angebote",
+      "intro": "Formulare und externe Anwendungen an einem Ort."
+    },
     "items": [
       {
-        "id": "protokolle",
-        "titel": "Sitzungsprotokolle",
-        "beschreibung": "Übersicht und Ablage der Protokolle.",
-        "typ": "seite",
-        "inhalt": "<h2>Sitzungsprotokolle</h2><p>Hier stehen später die aktuellen Protokolle. Dieser Text kommt aus <code>bereich.inhalt</code> in <code>config.local.json</code>.</p>",
-        "sichtbarkeit": ["alle"],
-        "active": true
-      },
-      {
-        "id": "spesenantrag",
-        "titel": "Spesenantrag",
-        "beschreibung": "Formular für Spesenabrechnungen.",
-        "typ": "formular",
-        "sichtbarkeit": ["vorstand", "kassenwart"],
-        "active": true
-      },
-      {
-        "id": "kassenbericht",
-        "titel": "Kassenbericht",
-        "beschreibung": "Nur für Kassenwart und Vorstand sichtbar.",
-        "typ": "seite",
-        "inhalt": "<p>Dieser Bereich sollte ohne Anmeldung <strong>nicht</strong> sichtbar sein (Sichtbarkeitstest).</p>",
-        "sichtbarkeit": ["kassenwart"],
-        "active": true
-      }
-    ]
-  },
-  "onlineServices": {
-    "section": { "kicker": "Links", "title": "Online-Dienste", "intro": "" },
-    "items": [
-      {
+        "id": "sharepoint-vorstand",
         "titel": "SharePoint Vorstand",
         "beschreibung": "Ablage für gemeinsame Dokumente.",
+        "typ": "extern",
         "url": "https://example.sharepoint.com",
         "neuesFenster": true,
         "active": true
       }
     ]
   },
-  "downloads": {
-    "section": { "kicker": "Dokumente", "title": "Downloads", "intro": "" },
-    "items": [
-      {
-        "titel": "Satzung",
-        "beschreibung": "Aktuelle Vereinssatzung als PDF.",
-        "url": "https://example.com/satzung.pdf",
-        "active": true
-      }
-    ]
-  },
   "footer": [
-    { "titel": "Impressum", "url": "https://example.com/impressum", "active": true },
-    { "titel": "Datenschutz", "url": "https://example.com/datenschutz", "active": true }
+    {
+      "titel": "Impressum",
+      "url": "https://example.com/impressum",
+      "active": true
+    },
+    {
+      "titel": "Datenschutz",
+      "url": "https://example.com/datenschutz",
+      "active": true
+    }
   ]
 }

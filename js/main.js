@@ -2,9 +2,6 @@ import {createApp} from "https://unpkg.com/petite-vue?module";
 import {state} from "./state.js?v=20260924-init-1";
 
 
-// Bestehende Form.io-Skripte rufen
-// diese globalen Funktionen auf.
-
 window.showMsgBox = (titel, inhalt, zurueckNachSchliessen, options = {}) =>
   state.zeigeMeldung(titel, inhalt, zurueckNachSchliessen, options);
 
@@ -41,10 +38,6 @@ window.logoutMember = () =>
   state.logout();
 
 
-/*
- * Zentrale Schnittstelle für
- * Form.io-Custom-JavaScript.
- */
 window.sendeFormular = (instance, config) =>
   state.sendeFormular(instance, config);
 
