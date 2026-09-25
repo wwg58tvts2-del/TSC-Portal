@@ -1,13 +1,13 @@
 {
   "page": {
-    "title": "Vorstandsportal (lokaler Test)",
-    "favicon": "img/favicon.png"
+    "title": "Vereinsportal",
+    "favicon": "img/Logo_ohne_Noten_quadratisch_transparenter_Hintergrund-1.png"
   },
   "header": {
     "logo": "img/Logo_ohne_Noten_transparenter_Hintergrund-1.png",
     "logoAlt": "Tanzsportclub Dortmund",
-    "kicker": "Vorstand",
-    "caption": "Internes Portal – lokale Testdaten"
+    "kicker": "Vereinsportal",
+    "caption": "Anwendungen, Dokumente und Formulare"
   },
   "memberLogin": {
     "active": true,
@@ -22,8 +22,8 @@
   },
   "body": {
     "kicker": "Willkommen",
-    "title": "Vorstandsportal",
-    "intro": "Zentrale Formulare und externe Anwendungen für den Vorstand."
+    "title": "Vereinsportal",
+    "intro": "Dein zentraler Zugang zu Anwendungen, Dokumenten und Formularen."
   },
   "bereiche": {
     "formBaseUrl": "https://tsc-form.m-wiesner.de/form/",
