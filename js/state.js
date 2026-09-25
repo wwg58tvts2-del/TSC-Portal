@@ -6,7 +6,7 @@ import {
   holeMemberStatus,
   sendeLogout,
   sendeFormularRequest
-} from "./api.js?v=20260925-oidc-logout-1";
+} from "./api.js?v=20260926-m365-response-1";
 
 import {
   leseBereichIdAusUrl,
@@ -279,7 +279,7 @@ export const state = reactive({
         this.zeigeMeldung(
           "Angemeldet",
           [
-            `Willkommen ${person.vorname || ""} ${person.nachname || ""}`.trim(),
+            `Willkommen ${person.name || `${person.vorname || ""} ${person.nachname || ""}`.trim()}`.trim(),
             `Gruppen: ${this.gruppen.join(", ")}`
           ].join("\n"),
           false
@@ -345,7 +345,8 @@ export const state = reactive({
       if (
         result.erfolgreich === true ||
         result.status === "nicht_angemeldet" ||
-        result.authenticated === false
+        result.authenticated === false ||
+        result.angemeldet === false
       ) {
         this.person = null;
       }
@@ -357,7 +358,11 @@ export const state = reactive({
 
       const result = error.result;
 
-      if (result?.erfolgreich === false && result.status === "nicht_angemeldet") {
+      if (
+        (result?.erfolgreich === false && result.status === "nicht_angemeldet") ||
+        result?.authenticated === false ||
+        result?.angemeldet === false
+      ) {
         this.person = null;
       }
 

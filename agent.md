@@ -1,6 +1,6 @@
 # Vorstandsportal – Codepflege
 
-Stand: 25.09.2026, Version `20260925-oidc-login-ui-2`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
+Stand: 26.09.2026, Version `20260926-m365-response-1`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
 
 ## Architektur und Stil
 
@@ -26,7 +26,7 @@ Die Anmeldung läuft vollständig über n8n als OIDC-Client gegen Microsoft Entr
 - `config.memberLogin.url` wird verwendet; ohne URL gilt `/webhook/oidc` als Standard. n8n startet dort den OIDC-Flow und setzt am Ende das Session-Cookie.
 - Form.io ist ausschließlich für Portalbereiche vom Typ `formular`, nicht für die Anmeldung.
 
-Login-Start: `/webhook/oidc`; Statusprüfung: `/webhook/oidc/me`. Dessen Antwort ist direkt das Person-Objekt mit `authenticated: true`, `csrfToken` und `roles`; der Parser unterstützt daneben weiterhin die bisherigen `person`-Antworten. `roles` werden als Bereichsgruppen verwendet, sofern `gruppen` fehlt. Der Logout sendet `person.csrfToken` als `X-CSRF-Token`: `POST /webhook/oidc/logout` mit Cookies und ohne Cache. HTTP-Erfolg mit `authenticated: false` beendet den lokalen Loginstatus. Der Browser setzt `Origin` selbst; Proxy und n8n müssen `Cookie`, `Origin` und `X-CSRF-Token` weiterreichen.
+Login-Start: `/webhook/oidc`; Statusprüfung: `/webhook/oidc/me`. Aktueller Vertrag: `{ angemeldet, person, csrfToken, expiresAt }`; Parser normalisiert äußere `csrfToken`-/`expiresAt`-Werte in `person` und unterstützt außerdem bisherige `authenticated`, `gefunden` und `erfolgreich`-Antworten. `roles` werden als Bereichsgruppen verwendet, sofern `gruppen` fehlt. Der Logout sendet das normalisierte `person.csrfToken` als `X-CSRF-Token`: `POST /webhook/oidc/logout` mit Cookies und ohne Cache. `angemeldet: false` oder `authenticated: false` beendet den lokalen Loginstatus. Der Browser setzt `Origin` selbst; Proxy und n8n müssen `Cookie`, `Origin` und `X-CSRF-Token` weiterreichen. Response-Logs redigieren Token- und Cookie-Felder.
 
 ## Formulare, Meldungen, Datei-Downloads
 

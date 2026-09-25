@@ -9,16 +9,35 @@ export function loggeResponse(label, response, body) {
   const header = {};
 
   response.headers.forEach((value, key) => {
-    header[key] = key.toLowerCase() === "set-cookie"
-      ? "[vom Browser aus Sicherheitsgründen nicht lesbar]"
+    header[key] = /cookie|token|secret/i.test(key)
+      ? "[redigiert]"
       : value;
   });
+
+  const redigierterBody = (value) => {
+    if (Array.isArray(value)) {
+      return value.map(redigierterBody);
+    }
+
+    if (value && typeof value === "object") {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, item]) => [
+          key,
+          /cookie|token|secret/i.test(key)
+            ? "[redigiert]"
+            : redigierterBody(item)
+        ])
+      );
+    }
+
+    return value;
+  };
 
   console.group(`[Vorstandsportal] ${label}`);
   console.log("Status:", response.status, response.statusText);
   console.log("URL:", response.url);
   console.log("Response-Header:", header);
-  console.log("Response-Body:", body);
+  console.log("Response-Body:", redigierterBody(body));
   console.groupEnd();
 }
 
@@ -112,20 +131,35 @@ export async function holeMemberStatus(url) {
   }
 
   const daten = Array.isArray(result) ? result[0] : result;
-  const person = daten?.person || (daten?.authenticated === true ? daten : null);
+  const angemeldet =
+    daten?.angemeldet === true ||
+    daten?.authenticated === true;
+  const person = daten?.person || (angemeldet ? daten : null);
   const gefunden =
-    daten?.authenticated === true ||
+    angemeldet ||
     daten?.gefunden === true ||
     daten?.erfolgreich === true;
-  const nichtAngemeldet = daten?.status === "fehlender_coockie"
+  const nichtAngemeldet = daten?.angemeldet === false
+    || daten?.authenticated === false
+    || daten?.status === "fehlender_coockie"
     || daten?.status === "fehlender_cookie"
     || daten?.status === "nicht_angemeldet";
 
-  if (nichtAngemeldet || !gefunden || !person) {
+  if (
+    nichtAngemeldet ||
+    !gefunden ||
+    !person ||
+    typeof person !== "object" ||
+    Array.isArray(person)
+  ) {
     return null;
   }
 
-  return person;
+  return {
+    ...person,
+    csrfToken: person.csrfToken || daten?.csrfToken,
+    expiresAt: person.expiresAt ?? daten?.expiresAt
+  };
 }
 
 export async function sendeLogout(config = {}, csrfToken) {
@@ -169,6 +203,7 @@ export async function sendeLogout(config = {}, csrfToken) {
     (
       typeof result.erfolgreich === "boolean" ||
       result.authenticated === false ||
+      result.angemeldet === false ||
       result.status === "nicht_angemeldet"
     );
 
