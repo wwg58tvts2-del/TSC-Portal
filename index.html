@@ -80,16 +80,25 @@
   </header>
 
   <main id="app">
-    <section v-if="view === 'login'" class="portal-login" aria-labelledby="login-title">
+    <section v-if="view === 'login'" id="member-login-container" class="portal-login" aria-labelledby="login-title">
       <div class="portal-login-heading">
+        <p class="section-kicker">Anmeldung</p>
         <h1 id="login-title">Anmeldung zum Vereinsportal</h1>
-        <p>Bitte melde dich mit deinem Microsoft-365-Konto an.</p>
       </div>
+      <p class="portal-login-intro">Bitte melde dich mit deinem Microsoft-365-Konto an.</p>
       <p v-if="warnung" class="alert alert-warning" role="alert">{{ warnung }}</p>
-      <button class="portal-login-button" type="button" @click="login()">
-        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
-        <span>{{ config?.memberLogin?.title || 'Mit Microsoft 365 anmelden' }}</span>
-      </button>
+      <div class="portal-login-controls">
+        <section class="portal-login-step-card">
+          <div class="portal-login-step-heading">
+            <span class="portal-login-step-number">M365</span>
+            <h2>Microsoft 365</h2>
+          </div>
+          <button class="portal-login-button" type="button" @click="login()">
+            <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>
+            <span>{{ config?.memberLogin?.title || 'Mit Microsoft 365 anmelden' }}</span>
+          </button>
+        </section>
+      </div>
     </section>
 
     <section v-else-if="view === 'auswahl'" id="form-selection">
