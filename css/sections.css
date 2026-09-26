@@ -3,6 +3,45 @@
   margin: 0 auto;
 }
 
+.portal-tile-search {
+  position: relative;
+  max-width: 560px;
+  margin: 0 auto 24px;
+}
+
+.portal-tile-search > i {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  color: var(--muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.portal-tile-search input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px 10px 42px;
+  color: var(--ink);
+  font: inherit;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.portal-tile-search input:focus {
+  border-color: var(--club-red);
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--club-red-soft);
+}
+
+.portal-search-empty {
+  max-width: 560px;
+  margin: 0 auto 24px;
+  color: var(--muted);
+  text-align: center;
+}
+
 .portal-login {
   max-width: 780px;
   margin: 28px auto 64px;

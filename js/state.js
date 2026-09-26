@@ -159,6 +159,7 @@ export const state = reactive({
   selectedBereich: null,
   activeFormInstance: null,
   warnung: "",
+  suchtext: "",
 
   msgbox: {
     visible: false,
@@ -314,13 +315,37 @@ export const state = reactive({
         typeof bereich.url === "string" &&
         bereich.url.trim().length > 0 &&
         bereich.type === "app"
-    );
+    ).filter((bereich) => this.passtZurKachelsuche(bereich));
   },
 
 
   get sichtbareFormulare() {
     return this.sichtbareBereiche.filter(
       (bereich) => bereich.type === "form"
+    ).filter((bereich) => this.passtZurKachelsuche(bereich));
+  },
+
+
+  get hatSichtbareKacheln() {
+    return this.sichtbareBereiche.some(
+      (bereich) => bereich.type === "app" || bereich.type === "form"
+    );
+  },
+
+
+  get keineKachelTreffer() {
+    return Boolean(this.suchtext.trim()) &&
+      this.sichtbareApps.length === 0 &&
+      this.sichtbareFormulare.length === 0;
+  },
+
+
+  passtZurKachelsuche(bereich) {
+    const suchtext = this.suchtext.trim().toLocaleLowerCase("de-DE");
+    if (!suchtext) return true;
+
+    return [bereich.title, bereich.description].some((text) =>
+      String(text || "").toLocaleLowerCase("de-DE").includes(suchtext)
     );
   },
 

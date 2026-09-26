@@ -109,6 +109,12 @@
       </section>
 
       <p v-if="warnung" class="alert alert-warning" role="alert">{{ warnung }}</p>
+      <div v-if="hatSichtbareKacheln" class="portal-tile-search">
+        <label class="visually-hidden" for="portal-tile-search">Kacheln durchsuchen</label>
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="portal-tile-search" v-model="suchtext" type="search" placeholder="Kacheln durchsuchen" autocomplete="off">
+      </div>
+      <p v-if="keineKachelTreffer" class="portal-search-empty" role="status">Keine passenden Kacheln gefunden.</p>
 
       <section v-if="sichtbareFormulare.length" id="forms-section">
         <div class="section-divider" aria-hidden="true"></div>
