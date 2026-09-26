@@ -347,7 +347,7 @@ export const state = reactive({
 
 
   get sichtbareApps() {
-    return this.sichtbareBereiche.filter(
+    return this.gefiltertePortalEintraege.filter(
       (bereich) =>
         typeof bereich.url === "string" &&
         bereich.url.trim().length > 0 &&
@@ -357,7 +357,7 @@ export const state = reactive({
 
 
   get sichtbareFormulare() {
-    return this.sichtbareBereiche.filter(
+    return this.gefiltertePortalEintraege.filter(
       (bereich) => bereich.type === "form"
     );
   },
