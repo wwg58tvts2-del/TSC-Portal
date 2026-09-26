@@ -25,6 +25,9 @@ function normalisiereKonfiguration(konfiguration) {
     areas: nestedAreas,
     apps: rootApps,
     forms: rootForms,
+    processes: rootProcesses,
+    onlineServices: rootOnlineServices,
+    downloads: rootDownloads,
     formBaseUrl: rootFormBaseUrl,
     pages: rootPages,
     ...rest
@@ -36,6 +39,9 @@ function normalisiereKonfiguration(konfiguration) {
     formulare,
     apps: nestedApps,
     forms: nestedForms,
+    processes: nestedProcesses,
+    onlineServices: nestedOnlineServices,
+    downloads: nestedDownloads,
     pages: nestedPages,
     section: alteSection
   } = quellAreas;
@@ -69,12 +75,13 @@ function normalisiereKonfiguration(konfiguration) {
     : Array.isArray(formulare)
       ? formulare
       : alteForms;
-  const pagesDaten = rootPages ?? nestedPages;
-  const pages = Array.isArray(pagesDaten)
-    ? pagesDaten
-    : Array.isArray(pagesDaten?.items)
-      ? pagesDaten.items
-    : alteSeiten;
+  const processesDaten = rootProcesses ?? nestedProcesses ?? rootPages ?? nestedPages ?? alteSeiten;
+  const processesObjekt = processesDaten && !Array.isArray(processesDaten) ? processesDaten : {};
+  const processesItems = Array.isArray(processesDaten)
+    ? processesDaten
+    : Array.isArray(processesObjekt.items)
+      ? processesObjekt.items
+      : [];
 
   const normalisiereSection = (section) => {
     const quelle = section && typeof section === "object" ? section : {};
@@ -112,6 +119,16 @@ function normalisiereKonfiguration(konfiguration) {
     };
   };
 
+  const normalisiereBereichsliste = (daten, type) => {
+    const objekt = daten && typeof daten === "object" && !Array.isArray(daten) ? daten : {};
+    const items = Array.isArray(daten) ? daten : Array.isArray(objekt.items) ? objekt.items : [];
+    return {
+      ...objekt,
+      section: normalisiereSection(objekt.section),
+      items: items.map((eintrag) => normalisiereEintrag(eintrag, type))
+    };
+  };
+
   const memberLogin = konfiguration.memberLogin
     ? (({titel, ...login}) => ({
         ...login,
@@ -130,6 +147,9 @@ function normalisiereKonfiguration(konfiguration) {
         title: link.title ?? titel ?? ""
       }))
     : konfiguration.footer;
+    const processes = normalisiereBereichsliste(processesDaten, "page");
+    const onlineServices = normalisiereBereichsliste(rootOnlineServices ?? nestedOnlineServices, "service");
+    const downloads = normalisiereBereichsliste(rootDownloads ?? nestedDownloads, "download");
 
   return {
     ...rest,
@@ -137,6 +157,9 @@ function normalisiereKonfiguration(konfiguration) {
     memberLogout,
     footer,
     formBaseUrl: rootFormBaseUrl ?? quellAreas.formBaseUrl,
+    processes,
+    onlineServices,
+    downloads,
     apps: {
       ...appsObjekt,
       section: normalisiereSection(appsObjekt.section || alteSection),
@@ -147,7 +170,7 @@ function normalisiereKonfiguration(konfiguration) {
       section: normalisiereSection(formsObjekt.section || alteSection),
       items: forms.map((eintrag) => normalisiereEintrag(eintrag, "form"))
     },
-    pages: pages.map((eintrag) => normalisiereEintrag(eintrag, "page"))
+    pages: processes.items
   };
 }
 
@@ -289,10 +312,17 @@ export const state = reactive({
 
 
   get bereichsEintraege() {
+    const processes = Array.isArray(this.config?.processes?.items)
+      ? this.config.processes.items
+      : Array.isArray(this.config?.pages)
+        ? this.config.pages
+        : [];
     return [
       ...(Array.isArray(this.config?.apps?.items) ? this.config.apps.items : []),
       ...(Array.isArray(this.config?.forms?.items) ? this.config.forms.items : []),
-      ...(Array.isArray(this.config?.pages) ? this.config.pages : [])
+      ...processes,
+      ...(Array.isArray(this.config?.onlineServices?.items) ? this.config.onlineServices.items : []),
+      ...(Array.isArray(this.config?.downloads?.items) ? this.config.downloads.items : [])
     ];
   },
 
@@ -309,34 +339,51 @@ export const state = reactive({
   },
 
 
+  get gefiltertePortalEintraege() {
+    return this.sichtbareBereiche.filter((bereich) => this.passtZurKachelsuche(bereich));
+  },
+
+
   get sichtbareApps() {
-    return this.sichtbareBereiche.filter(
+    return this.gefiltertePortalEintraege.filter(
       (bereich) =>
         typeof bereich.url === "string" &&
         bereich.url.trim().length > 0 &&
         bereich.type === "app"
-    ).filter((bereich) => this.passtZurKachelsuche(bereich));
-  },
-
-
-  get sichtbareFormulare() {
-    return this.sichtbareBereiche.filter(
-      (bereich) => bereich.type === "form"
-    ).filter((bereich) => this.passtZurKachelsuche(bereich));
-  },
-
-
-  get hatSichtbareKacheln() {
-    return this.sichtbareBereiche.some(
-      (bereich) => bereich.type === "app" || bereich.type === "form"
     );
   },
 
 
-  get keineKachelTreffer() {
+  get sichtbareFormulare() {
+    return this.gefiltertePortalEintraege.filter(
+      (bereich) => bereich.type === "form"
+    );
+  },
+
+
+  get sichtbareProzesse() {
+    return this.gefiltertePortalEintraege.filter((bereich) => bereich.type === "page");
+  },
+
+
+  get sichtbareOnlineServices() {
+    return this.gefiltertePortalEintraege.filter((bereich) => bereich.type === "service");
+  },
+
+
+  get sichtbareDownloads() {
+    return this.gefiltertePortalEintraege.filter((bereich) => bereich.type === "download");
+  },
+
+
+  get hatSichtbarePortalEintraege() {
+    return this.sichtbareBereiche.length > 0;
+  },
+
+
+  get keineSuchergebnisse() {
     return Boolean(this.suchtext.trim()) &&
-      this.sichtbareApps.length === 0 &&
-      this.sichtbareFormulare.length === 0;
+      this.gefiltertePortalEintraege.length === 0;
   },
 
 
@@ -344,9 +391,23 @@ export const state = reactive({
     const suchtext = this.suchtext.trim().toLocaleLowerCase("de-DE");
     if (!suchtext) return true;
 
-    return [bereich.title, bereich.description].some((text) =>
-      String(text || "").toLocaleLowerCase("de-DE").includes(suchtext)
+    const suchbegriffe = [
+      bereich.searchTerms,
+      bereich.searchKeywords,
+      bereich.keywords,
+      bereich.suchbegriffe,
+      bereich.suchwoerter,
+      bereich.tags
+    ].flatMap((begriff) => Array.isArray(begriff) ? begriff : [begriff]);
+    const texte = [bereich.title, bereich.titel, bereich.description, bereich.beschreibung, ...suchbegriffe];
+    return texte.some((text) =>
+      String(text ?? "").toLocaleLowerCase("de-DE").includes(suchtext)
     );
+  },
+
+
+  leereSuche() {
+    this.suchtext = "";
   },
 
 

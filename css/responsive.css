@@ -12,8 +12,12 @@
   }
 
   .site-header {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "logo"
+      "right"
+      "search";
     align-items: flex-start;
-    flex-direction: column;
     gap: 18px;
     min-height: 0;
     margin: 0 0 42px;
@@ -21,8 +25,20 @@
   }
 
   .site-logo {
+    grid-area: logo;
     width: min(330px, 100%);
     max-height: 88px;
+  }
+
+  .header-right {
+    grid-area: right;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .header-search {
+    grid-area: search;
+    width: 100%;
   }
 
   h1 {

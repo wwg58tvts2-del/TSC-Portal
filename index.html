@@ -59,23 +59,35 @@
       alt="Tanzsportclub Dortmund"
       :alt="config?.header?.logoAlt || 'Tanzsportclub Dortmund'"
     >
-    <div class="header-copy">
-      <span class="header-kicker">{{ config?.header?.kicker }}</span>
-      <span class="header-caption">{{ config?.header?.caption }}</span>
+    <div v-if="person && view === 'auswahl' && hatSichtbarePortalEintraege" class="header-search">
+      <label for="portal-global-search">Suche</label>
+      <div class="header-search-field">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input id="portal-global-search" v-model="suchtext" type="search" placeholder="Suche" autocomplete="off">
+        <button v-if="suchtext" class="header-search-clear" type="button" aria-label="Suche leeren" title="Suche leeren" @click="leereSuche()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
     </div>
-    <div
-      class="header-actions"
-      aria-label="Vorstandsbereich"
-      v-if="person && config?.memberLogout"
-    >
-      <button
-        class="header-login-button member-logout-button"
-        type="button"
-        @click="logout()"
+    <div class="header-right">
+      <div class="header-copy">
+        <span class="header-kicker">{{ config?.header?.kicker }}</span>
+        <span class="header-caption">{{ config?.header?.caption }}</span>
+      </div>
+      <div
+        class="header-actions"
+        aria-label="Vorstandsbereich"
+        v-if="person && config?.memberLogout"
       >
-        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-        <span>{{ logoutName + ' abmelden' }}</span>
-      </button>
+        <button
+          class="header-login-button member-logout-button"
+          type="button"
+          @click="logout()"
+        >
+          <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+          <span>{{ logoutName + ' abmelden' }}</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -109,12 +121,7 @@
       </section>
 
       <p v-if="warnung" class="alert alert-warning" role="alert">{{ warnung }}</p>
-      <div v-if="hatSichtbareKacheln" class="portal-tile-search">
-        <label class="visually-hidden" for="portal-tile-search">Kacheln durchsuchen</label>
-        <i class="bi bi-search" aria-hidden="true"></i>
-        <input id="portal-tile-search" v-model="suchtext" type="search" placeholder="Kacheln durchsuchen" autocomplete="off">
-      </div>
-      <p v-if="keineKachelTreffer" class="portal-search-empty" role="status">Keine passenden Kacheln gefunden.</p>
+      <p v-if="keineSuchergebnisse" class="portal-search-empty" role="status">Keine Ergebnisse gefunden</p>
 
       <section v-if="sichtbareFormulare.length" id="forms-section">
         <div class="section-divider" aria-hidden="true"></div>
@@ -127,6 +134,23 @@
             <p>{{ bereich.description }}</p>
             <button class="form-button-label" type="button" @click="oeffneBereich(bereich)">
               Formular öffnen
+              <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <section v-if="sichtbareProzesse.length" id="processes-section">
+        <div class="section-divider" aria-hidden="true"></div>
+        <p class="section-kicker">{{ config?.processes?.section?.kicker }}</p>
+        <h2 class="section-title">{{ config?.processes?.section?.title || 'Prozesse' }}</h2>
+        <p class="section-intro">{{ config?.processes?.section?.intro }}</p>
+        <div class="form-options" aria-live="polite">
+          <article class="form-option" v-for="prozess in sichtbareProzesse" :key="prozess.id">
+            <h2>{{ prozess.title }}</h2>
+            <p>{{ prozess.description }}</p>
+            <button class="form-button-label" type="button" @click="oeffneBereich(prozess)">
+              Öffnen
               <i class="bi bi-arrow-right" aria-hidden="true"></i>
             </button>
           </article>
@@ -150,6 +174,45 @@
             >
               Öffnen
               <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section v-if="sichtbareOnlineServices.length" id="services-section">
+        <div class="section-divider" aria-hidden="true"></div>
+        <p class="section-kicker">{{ config?.onlineServices?.section?.kicker }}</p>
+        <h2 class="section-title">{{ config?.onlineServices?.section?.title || 'Online-Services' }}</h2>
+        <p class="section-intro">{{ config?.onlineServices?.section?.intro }}</p>
+        <div class="form-options service-options" aria-live="polite">
+          <article class="form-option service-option" v-for="service in sichtbareOnlineServices" :key="service.id || service.url">
+            <h2>{{ service.title }}</h2>
+            <p>{{ service.description }}</p>
+            <a
+              class="service-button"
+              :href="service.url"
+              :target="service.openInNewWindow ? '_blank' : '_self'"
+              :rel="service.openInNewWindow ? 'noopener noreferrer' : null"
+            >
+              Öffnen
+              <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section v-if="sichtbareDownloads.length" id="downloads-section">
+        <div class="section-divider" aria-hidden="true"></div>
+        <p class="section-kicker">{{ config?.downloads?.section?.kicker }}</p>
+        <h2 class="section-title">{{ config?.downloads?.section?.title || 'Downloads' }}</h2>
+        <p class="section-intro">{{ config?.downloads?.section?.intro }}</p>
+        <div class="form-options download-options" aria-live="polite">
+          <article class="form-option download-option" v-for="download in sichtbareDownloads" :key="download.id || download.url">
+            <h2>{{ download.title }}</h2>
+            <p>{{ download.description }}</p>
+            <a class="download-button" :href="download.url" target="_blank" rel="noopener noreferrer">
+              <i class="bi bi-download" aria-hidden="true"></i>
+              Download
             </a>
           </article>
         </div>
