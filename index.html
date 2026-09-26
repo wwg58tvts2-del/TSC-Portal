@@ -34,7 +34,7 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.min.css"
   >
 
-  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/main.css?v=20260927-header-search-2">
 
   <!-- Form.io -->
   <link
@@ -51,42 +51,44 @@
 
 <body v-cloak v-scope>
   <header class="site-header">
-    <img
-      id="header-logo"
-      class="site-logo"
-      src="img/Logo_ohne_Noten_transparenter_Hintergrund-1.png"
-      :src="config?.header?.logo || 'img/Logo_ohne_Noten_transparenter_Hintergrund-1.png'"
-      alt="Tanzsportclub Dortmund"
-      :alt="config?.header?.logoAlt || 'Tanzsportclub Dortmund'"
-    >
-    <div v-if="person && view === 'auswahl' && hatSichtbarePortalEintraege" class="header-search">
-      <label for="portal-global-search">Suche</label>
-      <div class="header-search-field">
-        <i class="bi bi-search" aria-hidden="true"></i>
-        <input id="portal-global-search" v-model="suchtext" type="search" placeholder="Suche" autocomplete="off">
-        <button v-if="suchtext" class="header-search-clear" type="button" aria-label="Suche leeren" title="Suche leeren" @click="leereSuche()">
-          <i class="bi bi-x-lg" aria-hidden="true"></i>
-        </button>
-      </div>
-    </div>
-    <div class="header-right">
-      <div class="header-copy">
-        <span class="header-kicker">{{ config?.header?.kicker }}</span>
-        <span class="header-caption">{{ config?.header?.caption }}</span>
-      </div>
-      <div
-        class="header-actions"
-        aria-label="Vorstandsbereich"
-        v-if="person && config?.memberLogout"
+    <div class="site-header-inner">
+      <img
+        id="header-logo"
+        class="site-logo"
+        src="img/Logo_ohne_Noten_transparenter_Hintergrund-1.png"
+        :src="config?.header?.logo || 'img/Logo_ohne_Noten_transparenter_Hintergrund-1.png'"
+        alt="Tanzsportclub Dortmund"
+        :alt="config?.header?.logoAlt || 'Tanzsportclub Dortmund'"
       >
-        <button
-          class="header-login-button member-logout-button"
-          type="button"
-          @click="logout()"
+      <div v-if="person && view === 'auswahl' && hatSichtbarePortalEintraege" class="header-search">
+        <label class="visually-hidden" for="portal-global-search">Suche</label>
+        <div class="header-search-field">
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input id="portal-global-search" v-model="suchtext" type="search" placeholder="Suche" autocomplete="off">
+          <button v-if="suchtext" class="header-search-clear" type="button" aria-label="Suche löschen" title="Suche löschen" @mousedown.prevent @click="leereSuche()">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-copy">
+          <span class="header-kicker">{{ config?.header?.kicker }}</span>
+          <span class="header-caption">{{ config?.header?.caption }}</span>
+        </div>
+        <div
+          class="header-actions"
+          aria-label="Vorstandsbereich"
+          v-if="person && config?.memberLogout"
         >
-          <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-          <span>{{ logoutName + ' abmelden' }}</span>
-        </button>
+          <button
+            class="header-login-button member-logout-button"
+            type="button"
+            @click="logout()"
+          >
+            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+            <span>{{ logoutName + ' abmelden' }}</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>

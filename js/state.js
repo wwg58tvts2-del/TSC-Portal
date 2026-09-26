@@ -408,6 +408,7 @@ export const state = reactive({
 
   leereSuche() {
     this.suchtext = "";
+    document.getElementById("portal-global-search")?.focus();
   },
 
 

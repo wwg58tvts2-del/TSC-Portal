@@ -51,6 +51,7 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
         }
       ]
   },
+  "processes": { "section": {}, "items": [] },
   "onlineServices": { "section": {}, "items": [] },
   "downloads": { "section": {}, "items": [] },
   "footer": []
@@ -59,7 +60,9 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
 
 Nach erfolgreicher Anmeldung sind alle aktiven Bereiche sichtbar. `visibility`-Angaben in der Konfiguration werden nicht nach Gruppen ausgewertet; `active: false` blendet einen Eintrag weiterhin aus.
 
-Einträge in `forms.items` erscheinen unter **Formulare** und werden über `formBaseUrl` plus `id` in Form.io geöffnet. Einträge in `apps.items` erscheinen darunter als externe Links. Die Kicker, Titel und Intros der beiden Abschnitte werden über das jeweilige `section`-Objekt konfiguriert.
+Einträge in `forms.items` erscheinen unter **Formulare** und werden über `formBaseUrl` plus `id` in Form.io geöffnet. `apps.items` sind externe Anwendungen, `processes.items` (alternativ `pages`) sind interne Prozessseiten, `onlineServices.items` sind Online-Services und `downloads.items` sind Downloads. Die Kategorien verwenden jeweils `section` für Kicker, Titel und Intro.
+
+Die Suche in der Kopfzeile filtert alle aktiven Einträge nach Titel, Beschreibung und Suchbegriffen. Als Suchbegriffs-Felder werden `searchTerms`, `searchKeywords`, `keywords`, `suchbegriffe`, `suchwoerter` und `tags` berücksichtigt.
 
 Der Login startet über `/webhook/oidc`; `/webhook/oidc/me` liefert `{ angemeldet, person, csrfToken, expiresAt }`. Der API-Parser übernimmt die äußeren Sitzungswerte in das normalisierte Person-Objekt. Der Logout sendet `POST /webhook/oidc/logout` mit `credentials: "include"`, `cache: "no-store"` und dem Header `X-CSRF-Token`. `angemeldet: false` oder `authenticated: false` beendet den lokalen Anmeldestatus. Der Proxy muss `Cookie`, `Origin` und `X-CSRF-Token` an n8n weitergeben sowie `X-TSC-Cookie` serverseitig in `Set-Cookie` umwandeln und anschließend aus der Browserantwort entfernen. Token- und Cookie-Felder werden aus den Browser-Console-Logs redigiert.
 
