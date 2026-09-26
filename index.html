@@ -64,7 +64,7 @@
         <label class="visually-hidden" for="portal-global-search">Suche</label>
         <div class="header-search-field">
           <i class="bi bi-search" aria-hidden="true"></i>
-          <input id="portal-global-search" v-model="suchtext" type="search" placeholder="Suche" autocomplete="off">
+          <input id="portal-global-search" :value="suchtext" @input="setzeSuchtext($event.target.value)" type="search" placeholder="Suche" autocomplete="off">
           <button v-if="suchtext" class="header-search-clear" type="button" aria-label="Suche löschen" title="Suche löschen" @mousedown.prevent @click="leereSuche()">
             <i class="bi bi-x-lg" aria-hidden="true"></i>
           </button>
@@ -280,6 +280,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/main.js?v=20260927-global-search-1"></script>
+  <script type="module" src="js/main.js?v=20260927-global-search-2"></script>
 </body>
 </html>

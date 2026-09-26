@@ -345,18 +345,19 @@ export const state = reactive({
 
 
   get sichtbareApps() {
-    return this.gefiltertePortalEintraege.filter(
+    return this.sichtbareBereiche.filter(
       (bereich) =>
         typeof bereich.url === "string" &&
         bereich.url.trim().length > 0 &&
-        bereich.type === "app"
+        bereich.type === "app" &&
+        this.passtZurKachelsuche(bereich)
     );
   },
 
 
   get sichtbareFormulare() {
-    return this.gefiltertePortalEintraege.filter(
-      (bereich) => bereich.type === "form"
+    return this.sichtbareBereiche.filter(
+      (bereich) => bereich.type === "form" && this.passtZurKachelsuche(bereich)
     );
   },
 
@@ -409,6 +410,11 @@ export const state = reactive({
   leereSuche() {
     this.suchtext = "";
     document.getElementById("portal-global-search")?.focus();
+  },
+
+
+  setzeSuchtext(wert) {
+    this.suchtext = String(wert ?? "");
   },
 
 
