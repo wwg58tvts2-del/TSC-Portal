@@ -17,7 +17,7 @@ Die Startseite trennt die englische Root-Konfiguration in `config.forms` und `co
 - `forms.items`: Form.io-Formulare; sie erscheinen unter Formulare und werden über `config.formBaseUrl` + `id` geladen.
 - Zur Migration werden die früheren deutschen Schlüssel und das alte `bereiche.items`-Array beim Laden normalisiert; eine `url` kennzeichnet darin einen App-Link, `typ: "formular"` ein Form.io-Formular.
 
-Sichtbarkeit läuft unabhängig vom Typ über `visibility` (Array von Gruppennamen oder `"all"`) gegen die Gruppen des angemeldeten Vorstandsmitglieds (`state.gruppen`). Das Portal verwendet `person.gruppen` oder ersatzweise die OIDC-App-Rollen `roles` aus `/webhook/oidc/me`.
+Nach erfolgreicher OIDC-Anmeldung sind alle aktiven Bereiche sichtbar. `visibility` wird im Portal nicht nach Gruppen ausgewertet; `active: false` blendet Einträge weiterhin aus. `person.gruppen` und OIDC-App-Rollen `roles` aus `/webhook/oidc/me` werden nicht für die Bereichsfilterung verwendet.
 
 `onlineServices`, `downloads` und `footer` funktionieren unverändert wie im Serviceportal (externe Links, Downloads, Footer-Links).
 
@@ -37,5 +37,5 @@ Identisch zum Serviceportal: `window.sendeFormular(instance, config)`, Servertex
 ## Offene Punkte
 
 - `/webhook/vorstand-config` und die OIDC-Endpunkte in n8n müssen in der Produktivumgebung veröffentlicht und in der Portal-Konfiguration eingetragen sein.
-- Rechte-/Gruppenmodell (welche M365-Gruppe = welche Portalgruppe) wird in n8n gepflegt, nicht im Frontend.
+- Bereichszugriff ist nicht an M365-Gruppen gebunden; OIDC dient hier der Anmeldung.
 - Kein eigenes CMS für `area.content` – HTML wird direkt in der n8n-Konfiguration hinterlegt.

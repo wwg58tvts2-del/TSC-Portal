@@ -287,61 +287,6 @@ export const state = reactive({
   },
 
 
-  /*
-   * M365-Gruppen des angemeldeten Vorstandsmitglieds. Frei konfigurierbar
-   * über n8n/Azure AD, keine feste Werteliste wie im Serviceportal.
-   */
-  get gruppen() {
-    if (!this.person) {
-      return ["gast"];
-    }
-
-    const liste =
-      Array.isArray(this.person.gruppen)
-        ? this.person.gruppen
-        : Array.isArray(this.person.roles)
-          ? this.person.roles
-          : [this.person.gruppe || "gast"];
-
-    const bereinigt =
-      liste
-        .map((gruppe) => String(gruppe).trim().toLowerCase())
-        .filter(Boolean);
-
-    return bereinigt.length ? bereinigt : ["gast"];
-  },
-
-
-  istBereichSichtbar(bereich) {
-    const sichtbarkeit =
-      Array.isArray(bereich.visibility)
-        ? bereich.visibility
-        : [
-            bereich.visibility ||
-            "all"
-          ];
-
-    const erlaubteGruppen =
-      sichtbarkeit.map(
-        (gruppe) =>
-          String(gruppe)
-            .trim()
-            .toLowerCase()
-      );
-
-    return (
-      erlaubteGruppen.includes("all") ||
-      erlaubteGruppen.includes("alle") ||
-      erlaubteGruppen.some(
-        (gruppe) =>
-          this.gruppen.includes(
-            gruppe
-          )
-      )
-    );
-  },
-
-
   get bereichsEintraege() {
     return [
       ...(Array.isArray(this.config?.apps?.items) ? this.config.apps.items : []),
@@ -358,8 +303,7 @@ export const state = reactive({
 
     return this.bereichsEintraege.filter(
       (bereich) =>
-        bereich.active !== false &&
-        this.istBereichSichtbar(bereich)
+        bereich.active !== false
     );
   },
 
@@ -425,18 +369,10 @@ export const state = reactive({
         this.view = "auswahl";
       }
 
-      console.info(
-        "[Vorstandsportal] Erkannte Gruppen:",
-        this.gruppen
-      );
-
       if (!silent) {
         this.zeigeMeldung(
           "Angemeldet",
-          [
-            `Willkommen ${person.name || `${person.vorname || ""} ${person.nachname || ""}`.trim()}`.trim(),
-            `Gruppen: ${this.gruppen.join(", ")}`
-          ].join("\n"),
+          `Willkommen ${person.name || `${person.vorname || ""} ${person.nachname || ""}`.trim()}`.trim(),
           false
         );
       }
@@ -536,18 +472,6 @@ export const state = reactive({
 
 
   oeffneBereich(bereich) {
-    if (
-      !this.istBereichSichtbar(bereich)
-    ) {
-      this.zeigeMeldung(
-        "Keine Berechtigung",
-        "Dieser Bereich ist für deine Gruppen nicht freigegeben.",
-        false
-      );
-
-      return;
-    }
-
     this.warnung = "";
     this.selectedBereich = bereich;
     this.view =
@@ -655,15 +579,6 @@ export const state = reactive({
     if (!bereich) {
       this.warnung =
         "Der angeforderte Bereich wurde nicht gefunden.";
-
-      return;
-    }
-
-    if (
-      !this.istBereichSichtbar(bereich)
-    ) {
-      this.warnung =
-        "Dieser Bereich ist für deine Gruppen nicht freigegeben.";
 
       return;
     }

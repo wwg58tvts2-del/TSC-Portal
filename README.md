@@ -30,7 +30,6 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
           "id": "spesenantrag",
           "title": "Spesenantrag",
           "description": "Formular für Spesenabrechnungen.",
-          "visibility": ["vorstand", "kassenwart"],
           "active": true
         }
       ]
@@ -48,7 +47,6 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
           "description": "Ablage für gemeinsame Dokumente.",
           "url": "https://beispiel.sharepoint.com",
           "openInNewWindow": true,
-          "visibility": ["vorstand"],
           "active": true
         }
       ]
@@ -59,9 +57,9 @@ Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (pet
 }
 ```
 
-`person.gruppen` oder ersatzweise `person.roles` (Array, aus `/webhook/oidc/me`) bestimmt, welche Bereiche sichtbar sind – Gruppennamen beziehungsweise App-Rollen kommen aus Azure AD/M365 und werden frei in n8n gepflegt.
+Nach erfolgreicher Anmeldung sind alle aktiven Bereiche sichtbar. `visibility`-Angaben in der Konfiguration werden nicht nach Gruppen ausgewertet; `active: false` blendet einen Eintrag weiterhin aus.
 
-Einträge in `forms.items` erscheinen unter **Formulare** und werden über `formBaseUrl` plus `id` in Form.io geöffnet. Einträge in `apps.items` erscheinen darunter als externe Links. `visibility` regelt unabhängig davon den Zugriff. Die Kicker, Titel und Intros der beiden Abschnitte werden über das jeweilige `section`-Objekt konfiguriert.
+Einträge in `forms.items` erscheinen unter **Formulare** und werden über `formBaseUrl` plus `id` in Form.io geöffnet. Einträge in `apps.items` erscheinen darunter als externe Links. Die Kicker, Titel und Intros der beiden Abschnitte werden über das jeweilige `section`-Objekt konfiguriert.
 
 Der Login startet über `/webhook/oidc`; `/webhook/oidc/me` liefert `{ angemeldet, person, csrfToken, expiresAt }`. Der API-Parser übernimmt die äußeren Sitzungswerte in das normalisierte Person-Objekt. Der Logout sendet `POST /webhook/oidc/logout` mit `credentials: "include"`, `cache: "no-store"` und dem Header `X-CSRF-Token`. `angemeldet: false` oder `authenticated: false` beendet den lokalen Anmeldestatus. Der Proxy muss `Cookie`, `Origin` und `X-CSRF-Token` an n8n weitergeben sowie `X-TSC-Cookie` serverseitig in `Set-Cookie` umwandeln und anschließend aus der Browserantwort entfernen. Token- und Cookie-Felder werden aus den Browser-Console-Logs redigiert.
 
