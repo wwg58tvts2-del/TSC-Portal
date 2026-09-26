@@ -131,7 +131,7 @@
         <h2 class="section-title">{{ config?.forms?.section?.title || 'Formulare' }}</h2>
         <p class="section-intro">{{ config?.forms?.section?.intro }}</p>
         <div class="form-options" aria-live="polite">
-          <article class="form-option" v-for="bereich in sichtbareFormulare" :key="bereich.id">
+          <article class="form-option" v-for="bereich in sichtbareFormulare" :key="bereich.id" v-show="passtZurKachelsuche(bereich)">
             <h2>{{ bereich.title }}</h2>
             <p>{{ bereich.description }}</p>
             <button class="form-button-label" type="button" @click="oeffneBereich(bereich)">
@@ -148,7 +148,7 @@
         <h2 class="section-title">{{ config?.processes?.section?.title || 'Prozesse' }}</h2>
         <p class="section-intro">{{ config?.processes?.section?.intro }}</p>
         <div class="form-options" aria-live="polite">
-          <article class="form-option" v-for="prozess in sichtbareProzesse" :key="prozess.id">
+          <article class="form-option" v-for="prozess in sichtbareProzesse" :key="prozess.id" v-show="passtZurKachelsuche(prozess)">
             <h2>{{ prozess.title }}</h2>
             <p>{{ prozess.description }}</p>
             <button class="form-button-label" type="button" @click="oeffneBereich(prozess)">
@@ -165,7 +165,7 @@
         <h2 class="section-title">{{ config?.apps?.section?.title || 'Apps' }}</h2>
         <p class="section-intro">{{ config?.apps?.section?.intro }}</p>
         <div class="form-options" aria-live="polite">
-          <article class="form-option" v-for="bereich in sichtbareApps" :key="bereich.id">
+          <article class="form-option" v-for="bereich in sichtbareApps" :key="bereich.id" v-show="passtZurKachelsuche(bereich)">
             <h2>{{ bereich.title }}</h2>
             <p>{{ bereich.description }}</p>
             <a
@@ -187,7 +187,7 @@
         <h2 class="section-title">{{ config?.onlineServices?.section?.title || 'Online-Services' }}</h2>
         <p class="section-intro">{{ config?.onlineServices?.section?.intro }}</p>
         <div class="form-options service-options" aria-live="polite">
-          <article class="form-option service-option" v-for="service in sichtbareOnlineServices" :key="service.id || service.url">
+          <article class="form-option service-option" v-for="service in sichtbareOnlineServices" :key="service.id || service.url" v-show="passtZurKachelsuche(service)">
             <h2>{{ service.title }}</h2>
             <p>{{ service.description }}</p>
             <a
@@ -209,7 +209,7 @@
         <h2 class="section-title">{{ config?.downloads?.section?.title || 'Downloads' }}</h2>
         <p class="section-intro">{{ config?.downloads?.section?.intro }}</p>
         <div class="form-options download-options" aria-live="polite">
-          <article class="form-option download-option" v-for="download in sichtbareDownloads" :key="download.id || download.url">
+          <article class="form-option download-option" v-for="download in sichtbareDownloads" :key="download.id || download.url" v-show="passtZurKachelsuche(download)">
             <h2>{{ download.title }}</h2>
             <p>{{ download.description }}</p>
             <a class="download-button" :href="download.url" target="_blank" rel="noopener noreferrer">
@@ -280,6 +280,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/main.js?v=20260927-global-search-2"></script>
+  <script type="module" src="js/main.js?v=20260927-global-search-3"></script>
 </body>
 </html>
