@@ -1,5 +1,5 @@
 import {createApp} from "https://unpkg.com/petite-vue?module";
-import {state} from "./state.js?v=20260927-global-search-3";
+import {state} from "./state.js?v=20260927-global-search-4";
 
 
 window.showMsgBox = (titel, inhalt, zurueckNachSchliessen, options = {}) =>

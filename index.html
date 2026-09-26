@@ -131,14 +131,16 @@
         <h2 class="section-title">{{ config?.forms?.section?.title || 'Formulare' }}</h2>
         <p class="section-intro">{{ config?.forms?.section?.intro }}</p>
         <div class="form-options" aria-live="polite">
-          <article class="form-option" v-for="bereich in sichtbareFormulare" :key="bereich.id" v-show="passtZurKachelsuche(bereich)">
-            <h2>{{ bereich.title }}</h2>
-            <p>{{ bereich.description }}</p>
-            <button class="form-button-label" type="button" @click="oeffneBereich(bereich)">
-              Formular öffnen
-              <i class="bi bi-arrow-right" aria-hidden="true"></i>
-            </button>
-          </article>
+          <template v-for="bereich in config?.forms?.items || []" :key="bereich.id">
+            <article v-if="bereich.visible" class="form-option">
+              <h2>{{ bereich.title }}</h2>
+              <p>{{ bereich.description }}</p>
+              <button class="form-button-label" type="button" @click="oeffneBereich(bereich)">
+                Formular öffnen
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+              </button>
+            </article>
+          </template>
         </div>
       </section>
 
@@ -148,14 +150,16 @@
         <h2 class="section-title">{{ config?.processes?.section?.title || 'Prozesse' }}</h2>
         <p class="section-intro">{{ config?.processes?.section?.intro }}</p>
         <div class="form-options" aria-live="polite">
-          <article class="form-option" v-for="prozess in sichtbareProzesse" :key="prozess.id" v-show="passtZurKachelsuche(prozess)">
-            <h2>{{ prozess.title }}</h2>
-            <p>{{ prozess.description }}</p>
-            <button class="form-button-label" type="button" @click="oeffneBereich(prozess)">
-              Öffnen
-              <i class="bi bi-arrow-right" aria-hidden="true"></i>
-            </button>
-          </article>
+          <template v-for="prozess in config?.processes?.items || []" :key="prozess.id">
+            <article v-if="prozess.visible" class="form-option">
+              <h2>{{ prozess.title }}</h2>
+              <p>{{ prozess.description }}</p>
+              <button class="form-button-label" type="button" @click="oeffneBereich(prozess)">
+                Öffnen
+                <i class="bi bi-arrow-right" aria-hidden="true"></i>
+              </button>
+            </article>
+          </template>
         </div>
       </section>
 
@@ -165,19 +169,21 @@
         <h2 class="section-title">{{ config?.apps?.section?.title || 'Apps' }}</h2>
         <p class="section-intro">{{ config?.apps?.section?.intro }}</p>
         <div class="form-options" aria-live="polite">
-          <article class="form-option" v-for="bereich in sichtbareApps" :key="bereich.id" v-show="passtZurKachelsuche(bereich)">
-            <h2>{{ bereich.title }}</h2>
-            <p>{{ bereich.description }}</p>
-            <a
-              class="service-button"
-              :href="bereich.url"
-              :target="bereich.openInNewWindow ? '_blank' : '_self'"
-              :rel="bereich.openInNewWindow ? 'noopener noreferrer' : null"
-            >
-              Öffnen
-              <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-            </a>
-          </article>
+          <template v-for="bereich in config?.apps?.items || []" :key="bereich.url || bereich.id">
+            <article v-if="bereich.visible" class="form-option">
+              <h2>{{ bereich.title }}</h2>
+              <p>{{ bereich.description }}</p>
+              <a
+                class="service-button"
+                :href="bereich.url"
+                :target="bereich.openInNewWindow ? '_blank' : '_self'"
+                :rel="bereich.openInNewWindow ? 'noopener noreferrer' : null"
+              >
+                Öffnen
+                <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+              </a>
+            </article>
+          </template>
         </div>
       </section>
 
@@ -187,19 +193,21 @@
         <h2 class="section-title">{{ config?.onlineServices?.section?.title || 'Online-Services' }}</h2>
         <p class="section-intro">{{ config?.onlineServices?.section?.intro }}</p>
         <div class="form-options service-options" aria-live="polite">
-          <article class="form-option service-option" v-for="service in sichtbareOnlineServices" :key="service.id || service.url" v-show="passtZurKachelsuche(service)">
-            <h2>{{ service.title }}</h2>
-            <p>{{ service.description }}</p>
-            <a
-              class="service-button"
-              :href="service.url"
-              :target="service.openInNewWindow ? '_blank' : '_self'"
-              :rel="service.openInNewWindow ? 'noopener noreferrer' : null"
-            >
-              Öffnen
-              <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-            </a>
-          </article>
+          <template v-for="service in config?.onlineServices?.items || []" :key="service.id || service.url">
+            <article v-if="service.visible" class="form-option service-option">
+              <h2>{{ service.title }}</h2>
+              <p>{{ service.description }}</p>
+              <a
+                class="service-button"
+                :href="service.url"
+                :target="service.openInNewWindow ? '_blank' : '_self'"
+                :rel="service.openInNewWindow ? 'noopener noreferrer' : null"
+              >
+                Öffnen
+                <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+              </a>
+            </article>
+          </template>
         </div>
       </section>
 
@@ -209,14 +217,16 @@
         <h2 class="section-title">{{ config?.downloads?.section?.title || 'Downloads' }}</h2>
         <p class="section-intro">{{ config?.downloads?.section?.intro }}</p>
         <div class="form-options download-options" aria-live="polite">
-          <article class="form-option download-option" v-for="download in sichtbareDownloads" :key="download.id || download.url" v-show="passtZurKachelsuche(download)">
-            <h2>{{ download.title }}</h2>
-            <p>{{ download.description }}</p>
-            <a class="download-button" :href="download.url" target="_blank" rel="noopener noreferrer">
-              <i class="bi bi-download" aria-hidden="true"></i>
-              Download
-            </a>
-          </article>
+          <template v-for="download in config?.downloads?.items || []" :key="download.id || download.url">
+            <article v-if="download.visible" class="form-option download-option">
+              <h2>{{ download.title }}</h2>
+              <p>{{ download.description }}</p>
+              <a class="download-button" :href="download.url" target="_blank" rel="noopener noreferrer">
+                <i class="bi bi-download" aria-hidden="true"></i>
+                Download
+              </a>
+            </article>
+          </template>
         </div>
       </section>
 
@@ -280,6 +290,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/main.js?v=20260927-global-search-3"></script>
+  <script type="module" src="js/main.js?v=20260927-global-search-4"></script>
 </body>
 </html>

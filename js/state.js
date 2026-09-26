@@ -115,7 +115,8 @@ function normalisiereKonfiguration(konfiguration) {
         ? visibility.map((gruppe) => String(gruppe).toLowerCase() === "alle" ? "all" : gruppe)
         : String(visibility).toLowerCase() === "alle" ? "all" : visibility,
       openInNewWindow: eintrag?.openInNewWindow ?? neuesFenster ?? false,
-      content: eintrag?.content ?? inhalt
+      content: eintrag?.content ?? inhalt,
+      visible: eintrag?.active !== false
     };
   };
 
@@ -261,6 +262,7 @@ export const state = reactive({
       }
 
       this.config = normalisiereKonfiguration(this.config);
+      this.aktualisiereSichtbarkeit();
 
       console.log("[Vorstandsportal] Konfiguration im State übernommen");
 
@@ -340,7 +342,7 @@ export const state = reactive({
 
 
   get gefiltertePortalEintraege() {
-    return this.sichtbareBereiche.filter((bereich) => this.passtZurKachelsuche(bereich));
+    return this.sichtbareBereiche.filter((bereich) => bereich.visible);
   },
 
 
@@ -349,15 +351,14 @@ export const state = reactive({
       (bereich) =>
         typeof bereich.url === "string" &&
         bereich.url.trim().length > 0 &&
-        bereich.type === "app" &&
-        this.passtZurKachelsuche(bereich)
+        bereich.type === "app"
     );
   },
 
 
   get sichtbareFormulare() {
     return this.sichtbareBereiche.filter(
-      (bereich) => bereich.type === "form" && this.passtZurKachelsuche(bereich)
+      (bereich) => bereich.type === "form"
     );
   },
 
@@ -388,6 +389,13 @@ export const state = reactive({
   },
 
 
+  aktualisiereSichtbarkeit() {
+    this.bereichsEintraege.forEach((bereich) => {
+      bereich.visible = bereich.active !== false && this.passtZurKachelsuche(bereich);
+    });
+  },
+
+
   passtZurKachelsuche(bereich) {
     const suchtext = this.suchtext.trim().toLocaleLowerCase("de-DE");
     if (!suchtext) return true;
@@ -408,13 +416,14 @@ export const state = reactive({
 
 
   leereSuche() {
-    this.suchtext = "";
+    this.setzeSuchtext("");
     document.getElementById("portal-global-search")?.focus();
   },
 
 
   setzeSuchtext(wert) {
     this.suchtext = String(wert ?? "");
+    this.aktualisiereSichtbarkeit();
   },
 
 
