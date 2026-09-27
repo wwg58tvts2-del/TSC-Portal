@@ -1,41 +1,37 @@
-# Vorstandsportal – Codepflege
+# Agent Guide: Task-Portal
 
-Stand: 26.09.2026, Version `20260926-flat-config-1`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
-Stand: 26.09.2026, Version `20260926-flat-config-1`. Schwesterprojekt des [Serviceportals](../5_Serviceportal/agent.md) – gleiche Architektur (petite-vue, Bootstrap, Form.io, n8n als Backend), aber eigener Zweck: konfigurierbares internes Portal für den Vorstand statt Selfservice für Mitglieder.
+## Projektgrenzen
 
-## Architektur und Stil
+Das Task-Portal ist ein statisches Petite-Vue-Frontend. n8n liefert die Portal-Konfiguration und betreibt den OIDC-Client; Form.io betreibt die konfigurierten Formulare. Diese externen Systeme und ihre Produktivdaten sind nicht Teil dieses Repositories.
 
-`main.js` veröffentlicht globale Funktionen und startet Petite Vue. `state.js` steuert Zustand und Oberfläche; `api.js` enthält Netzwerkaufrufe und Logging ohne Zugriff auf den State. `formio.js` erstellt und zerstört Formularinstanzen. `navigation.js` steuert URL (`?bereich=...`) und History. Die Konfiguration wird über `/webhook/vorstand-config` geladen (eigener Endpunkt, unabhängig vom Serviceportal); CSS wird über `css/main.css` eingebunden, `responsive.css` zuletzt.
+Es gibt kein npm-Projekt und keinen Buildschritt. Bibliotheken werden über CDN-URLs eingebunden. Für Portalansichten das vorgesehene Testsystem verwenden; keine lokale Portalwebsite im integrierten Browser öffnen.
 
-Deutsche Namen und Modulgrenzen wie im Serviceportal beibehalten. Neue Aufrufe kompakt schreiben, keine unnötigen Zeilenumbrüche oder beiläufigen Umformatierungen.
+## Zuständigkeiten
 
-## Unterschied zum Serviceportal: Bereiche statt Formulare
+- `index.html`: Header-/Suche, fünf Kategorien, Login und ausgewählter Portalbereich.
+- `js/state.js`: Konfigurationsnormalisierung, Sitzungsstatus, sichtbare Items, Suche, URL-Zustand und Formularabläufe.
+- `js/api.js`: Fetch-Aufrufe und redigiertes Response-Logging.
+- `js/formio.js`: Lebenszyklus von Form.io-Instanzen.
+- `js/navigation.js`: `?bereich=` und Browser-History.
+- `js/main.js`: Petite-Vue-Mount und globale Schnittstellen.
+- `css/main.css`: Importreihenfolge; `responsive.css` zuletzt laden.
 
-Die Startseite trennt die englische Root-Konfiguration in `config.forms` und `config.apps`; beide Kategorien enthalten jeweils `section` (`kicker`, `title`, `intro`) und `items`:
+## Daten- und Zugriffsregeln
 
-- `apps.items`: externe Webseiten mit `url`; sie erscheinen unter Apps.
-- `forms.items`: Form.io-Formulare; sie erscheinen unter Formulare und werden über `config.formBaseUrl` + `id` geladen.
-- Zur Migration werden die früheren deutschen Schlüssel und das alte `bereiche.items`-Array beim Laden normalisiert; eine `url` kennzeichnet darin einen App-Link, `typ: "formular"` ein Form.io-Formular.
+- Konfigurationsobjekte werden beim Laden in `apps`, `forms`, `processes`, `onlineServices` und `downloads` normalisiert. Legacy-Formen wie `bereiche.items`, `pages`, `titel` und `beschreibung` bleiben unterstützt.
+- Jedes normalisierte Item erhält `visible`. Die Kopfzeilensuche aktualisiert diese Flags; die Kategorien rendern ihre gefilterten Getter. Suchfelder: Titel, Beschreibung sowie `searchTerms`, `searchKeywords`, `keywords`, `suchbegriffe`, `suchwoerter` und `tags`.
+- `active: false` blendet ein Item aus. `visibility`, `person.gruppen` und OIDC-Rollen sind keine Gruppenberechtigungsprüfung im Frontend. Autorisierung muss n8n/Form.io serverseitig erzwingen.
+- Apps und Online-Services benötigen eine URL. Form.io-Formulare benötigen `id` und `formBaseUrl`; Prozessseiten verwenden HTML-Inhalt in `content`.
+- OIDC: Login über konfigurierte URL oder `/webhook/oidc`; Status über `/webhook/oidc/me`; Logout ausschließlich POST mit CSRF-Token.
+- Form.io-Requests bleiben über `window.sendeFormular(instance, config)` zentralisiert. Responses mit `erfolgreich`, Meldung und optionalem Dateiinhalt gemäß bestehendem Vertrag behandeln.
+- `visible` ist Laufzeitstatus, kein Backend-Zugriffsmerkmal. `v-for` soll die sichtbaren Getter verwenden; keine zusätzliche `v-show`-Schicht auf dieselben gefilterten Kacheln legen.
 
-Nach erfolgreicher OIDC-Anmeldung sind alle aktiven Bereiche sichtbar. `visibility` wird im Portal nicht nach Gruppen ausgewertet; `active: false` blendet Einträge weiterhin aus. `person.gruppen` und OIDC-App-Rollen `roles` aus `/webhook/oidc/me` werden nicht für die Bereichsfilterung verwendet.
+## Vorgehen und Prüfung
 
-`onlineServices`, `downloads` und `footer` funktionieren unverändert wie im Serviceportal (externe Links, Downloads, Footer-Links).
+1. Quellcode ist die Referenz für Laufzeitverhalten; Konfiguration kommt vom n8n-Endpunkt.
+2. Bei Moduländerungen Cachekennungen in `index.html` und importierenden Modulen zusammen aktualisieren.
+3. Geänderte JavaScript-Dateien mit `node --check <datei>` prüfen; JSON mit `python3 -m json.tool <datei>`.
+4. Suchänderungen mit Treffern aus allen Kategorien, leerer Suche, `active: false`, Schreibweisen in Legacy-Feldern und Suchbegriffen prüfen.
+5. OIDC-/Form.io-Änderungen zusätzlich auf Fehlerpfade, CSRF, Cleanup und Rücknavigation prüfen. Keine Live-Webhook-Aufrufe ohne ausdrückliche Freigabe.
 
-## Anmeldung (Microsoft 365 / OIDC)
-
-Die Anmeldung läuft vollständig über n8n als OIDC-Client gegen Microsoft Entra ID (M365). Die eigene Loginansicht sammelt keine Zugangsdaten; ihr Button ruft `state.login()` auf:
-
-- `config.memberLogin.url` wird verwendet; ohne URL gilt `/webhook/oidc` als Standard. n8n startet dort den OIDC-Flow und setzt am Ende das Session-Cookie.
-- Form.io ist ausschließlich für Portalbereiche vom Typ `formular`, nicht für die Anmeldung.
-
-Login-Start: `/webhook/oidc`; Statusprüfung: `/webhook/oidc/me`. Aktueller Vertrag: `{ angemeldet, person, csrfToken, expiresAt }`; Parser normalisiert äußere `csrfToken`-/`expiresAt`-Werte in `person` und unterstützt außerdem bisherige `authenticated`, `gefunden` und `erfolgreich`-Antworten. `roles` werden als Bereichsgruppen verwendet, sofern `gruppen` fehlt. Der Logout sendet das normalisierte `person.csrfToken` als `X-CSRF-Token`: `POST /webhook/oidc/logout` mit Cookies und ohne Cache. `angemeldet: false` oder `authenticated: false` beendet den lokalen Loginstatus. Der Browser setzt `Origin` selbst; Proxy und n8n müssen `Cookie`, `Origin` und `X-CSRF-Token` weiterreichen. Response-Logs redigieren Token- und Cookie-Felder.
-
-## Formulare, Meldungen, Datei-Downloads
-
-Identisch zum Serviceportal: `window.sendeFormular(instance, config)`, Servertexte über `zeigeServerMeldung()`, optionaler Base64-Datei-Download, `finally` schließt Loader und entsperrt Button. Siehe [Serviceportal-agent.md](../5_Serviceportal/agent.md) für die vollständigen JSON- und Fehlerregeln – sie gelten hier unverändert.
-
-## Offene Punkte
-
-- `/webhook/vorstand-config` und die OIDC-Endpunkte in n8n müssen in der Produktivumgebung veröffentlicht und in der Portal-Konfiguration eingetragen sein.
-- Bereichszugriff ist nicht an M365-Gruppen gebunden; OIDC dient hier der Anmeldung.
-- Kein eigenes CMS für `area.content` – HTML wird direkt in der n8n-Konfiguration hinterlegt.
+Es gibt hier kein automatisches Test- oder Buildsystem. Simulierte State-Tests nicht als Live-Integrationstest ausgeben.

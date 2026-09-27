@@ -1,69 +1,35 @@
-# Vorstandsportal
+# Task-Portal
 
-Konfigurierbares internes Portal für den Vorstand. Reines HTML/JS-Frontend (petite-vue, Bootstrap, Form.io), Backend/Konfiguration und Microsoft-365-Anmeldung (OIDC) laufen über n8n. Architektur und Konventionen sind in [agent.md](agent.md) beschrieben.
+Statisches Petite-Vue-Portal für Anwendungen, Formulare, Prozessseiten, Online-Services und Downloads. Das Frontend lädt seine Konfiguration und den Microsoft-Entra-ID/OIDC-Sitzungsstatus über n8n. Form.io wird nur für die konfigurierten Portalformulare verwendet.
 
-## Struktur
+## Start
 
-- `index.html` – Einstiegspunkt, lädt Konfiguration von `/webhook/vorstand-config`.
-- `css/` – gleiches Design wie das [Serviceportal](../5_Serviceportal/README.md).
-- `js/` – `main.js`, `state.js`, `api.js`, `navigation.js`, `formio.js`.
+`config.json` verweist aktuell auf `/webhook/config/portal`. Die eigentliche Laufzeitkonfiguration kommt von diesem Endpunkt. Für Login und geschützte Formularrequests ist HTTPS mit funktionierender Cookie-Weitergabe erforderlich. Petite Vue, Bootstrap, Bootstrap Icons und Form.io werden von CDNs geladen. Im Repository gibt es keinen Paketmanager oder Build-Schritt.
 
-## Konfigurationsbeispiel (`/webhook/vorstand-config`)
+## Kategorien
 
-```json
-{
-  "page": { "title": "Vorstandsportal", "favicon": "img/favicon.png" },
-  "header": { "logo": "img/logo.png", "kicker": "Vorstand", "caption": "Internes Portal" },
-  "memberLogin": { "active": true, "title": "Mit Microsoft 365 anmelden", "url": "/webhook/oidc" },
-  "memberStatusUrl": "/webhook/oidc/me",
-  "memberLogout": { "webhookUrl": "/webhook/oidc/logout", "method": "POST", "loadingText": "Du wirst abgemeldet ..." },
-  "body": { "kicker": "Willkommen", "title": "Vorstandsportal", "intro": "Interne Bereiche für den Vorstand." },
-  "formBaseUrl": "https://beispiel.form.io/vorstand",
-  "forms": {
-      "section": {
-        "kicker": "Anträge und Anliegen",
-        "title": "Formulare",
-        "intro": "Digitale Formulare für Anliegen rund um den Verein."
-      },
-      "items": [
-        {
-          "id": "spesenantrag",
-          "title": "Spesenantrag",
-          "description": "Formular für Spesenabrechnungen.",
-          "active": true
-        }
-      ]
-  },
-  "apps": {
-      "section": {
-        "kicker": "Externe Angebote",
-        "title": "Apps",
-        "intro": "Direkt zu den digitalen Angeboten des Vereins."
-      },
-      "items": [
-        {
-          "id": "sharepoint-vorstand",
-          "title": "SharePoint Vorstand",
-          "description": "Ablage für gemeinsame Dokumente.",
-          "url": "https://beispiel.sharepoint.com",
-          "openInNewWindow": true,
-          "active": true
-        }
-      ]
-  },
-  "processes": { "section": {}, "items": [] },
-  "onlineServices": { "section": {}, "items": [] },
-  "downloads": { "section": {}, "items": [] },
-  "footer": []
-}
-```
+Die Root-Konfiguration enthält `apps.items`, `forms.items`, `processes.items`, `onlineServices.items` und `downloads.items`. Prozessseiten können auch als `pages` geliefert werden. Abschnittstexte stehen unter `section`. Formulare werden mit `formBaseUrl` und der Formular-`id` geöffnet; Anwendungen und Online-Services verwenden `url`; Prozessseiten verwenden `content`; Downloads verwenden `url`.
 
-Nach erfolgreicher Anmeldung sind alle aktiven Bereiche sichtbar. `visibility`-Angaben in der Konfiguration werden nicht nach Gruppen ausgewertet; `active: false` blendet einen Eintrag weiterhin aus.
+Die Kopfzeilensuche durchsucht alle fünf Kategorien nach Titel, Beschreibung und Suchbegriffen. `active: false` blendet einen Eintrag aus. Einträge mit `visibility` werden nicht nach OIDC-Gruppen gefiltert; die UI ersetzt keine serverseitige Berechtigungsprüfung.
 
-Einträge in `forms.items` erscheinen unter **Formulare** und werden über `formBaseUrl` plus `id` in Form.io geöffnet. `apps.items` sind externe Anwendungen, `processes.items` (alternativ `pages`) sind interne Prozessseiten, `onlineServices.items` sind Online-Services und `downloads.items` sind Downloads. Die Kategorien verwenden jeweils `section` für Kicker, Titel und Intro.
+## Anmeldung und Datenschutz
 
-Die Suche in der Kopfzeile filtert alle aktiven Einträge nach Titel, Beschreibung und Suchbegriffen. Als Suchbegriffs-Felder werden `searchTerms`, `searchKeywords`, `keywords`, `suchbegriffe`, `suchwoerter` und `tags` berücksichtigt.
+Der Loginbutton startet den konfigurierten `memberLogin.url` oder `/webhook/oidc`. `/webhook/oidc/me` prüft die Sitzung. Der Logout sendet POST mit `X-CSRF-Token`. Requests verwenden Cookies und `cache: "no-store"`; Token- und Cookie-Felder werden aus API-Logs redigiert. Proxy und n8n müssen die Session- und CSRF-Header korrekt weiterleiten.
 
-Der Login startet über `/webhook/oidc`; `/webhook/oidc/me` liefert `{ angemeldet, person, csrfToken, expiresAt }`. Der API-Parser übernimmt die äußeren Sitzungswerte in das normalisierte Person-Objekt. Der Logout sendet `POST /webhook/oidc/logout` mit `credentials: "include"`, `cache: "no-store"` und dem Header `X-CSRF-Token`. `angemeldet: false` oder `authenticated: false` beendet den lokalen Anmeldestatus. Der Proxy muss `Cookie`, `Origin` und `X-CSRF-Token` an n8n weitergeben sowie `X-TSC-Cookie` serverseitig in `Set-Cookie` umwandeln und anschließend aus der Browserantwort entfernen. Token- und Cookie-Felder werden aus den Browser-Console-Logs redigiert.
+`state.js` versucht bei einem nicht erreichbaren Konfigurationswebhook auf `config.local.json` zurückzufallen. Diese Datei ist nicht Bestandteil des Repositories und muss, falls dieser Entwicklungsweg genutzt wird, gesondert bereitgestellt werden.
 
-Die Portal-Loginansicht sammelt keine Zugangsdaten und verwendet kein Form.io. Ihr Button leitet zum konfigurierten `memberLogin.url` oder standardmäßig zu `/webhook/oidc` weiter; Form.io bleibt den eigentlichen Portalformularen vorbehalten.
+## Dateien
+
+| Pfad | Verantwortung |
+| --- | --- |
+| `index.html` | Kopfzeile, Suche, Kategorien und Formular-/Prozessansichten |
+| `config.json` | URL zur Laufzeitkonfiguration |
+| `js/main.js` | Petite-Vue-Mount und globale Integrationen |
+| `js/state.js` | Normalisierung, OIDC-State, sichtbare Items, Suche und Form.io |
+| `js/api.js` | HTTP-Aufrufe und redigiertes Logging |
+| `js/formio.js` | Form.io-Instanzen erstellen und zerstören |
+| `js/navigation.js` | `?bereich=` und Browser-History |
+| `css/main.css` | Importiert die aufgeteilten Stylesheets |
+| `wiki/` | Technische Referenz und Betriebswissen |
+
+Details stehen im [Wiki](wiki/README.md); Regeln für Änderungen stehen in [agent.md](agent.md).
