@@ -14,7 +14,7 @@ Dieses Repository enthält keinen GitHub-Actions-Deploymentworkflow. Der produkt
 
 - JavaScript-Syntax: `node --check js/state.js` und `node --check js/main.js`.
 - JSON-Konfiguration: `python3 -m json.tool config.json`.
-- Suche: pro Kategorie Treffer, leere Suche, keine Treffer und `active: false` prüfen.
+- Suche: pro Kategorie Treffer, leere Suche und keine Treffer prüfen; `active` und `visibility` verbleiben beim Backend.
 - OIDC: Statusantwort, Cookie-Weitergabe, CSRF-Logout und 401/403-Pfad prüfen.
 - Form.io: HTTP-Fehler, fachliches `erfolgreich: false`, optionalen Download, Callback und `finally`-Cleanup prüfen.
 

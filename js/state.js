@@ -116,7 +116,7 @@ function normalisiereKonfiguration(konfiguration) {
         : String(visibility).toLowerCase() === "alle" ? "all" : visibility,
       openInNewWindow: eintrag?.openInNewWindow ?? neuesFenster ?? false,
       content: eintrag?.content ?? inhalt,
-      visible: eintrag?.active !== false
+      visible: true
     };
   };
 
@@ -334,10 +334,7 @@ export const state = reactive({
       return [];
     }
 
-    return this.bereichsEintraege.filter(
-      (bereich) =>
-        bereich.active !== false
-    );
+    return this.bereichsEintraege;
   },
 
 
@@ -391,7 +388,7 @@ export const state = reactive({
 
   aktualisiereSichtbarkeit() {
     this.bereichsEintraege.forEach((bereich) => {
-      bereich.visible = bereich.active !== false && this.passtZurKachelsuche(bereich);
+      bereich.visible = this.passtZurKachelsuche(bereich);
     });
   },
 
@@ -435,10 +432,7 @@ export const state = reactive({
         ? this.config.footer
         : [];
 
-    return links.filter(
-      (link) =>
-        link.active !== false
-    );
+    return links;
   },
 
 

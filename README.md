@@ -10,7 +10,7 @@ Statisches Petite-Vue-Portal für Anwendungen, Formulare, Prozessseiten, Online-
 
 Die Root-Konfiguration enthält `apps.items`, `forms.items`, `processes.items`, `onlineServices.items` und `downloads.items`. Prozessseiten können auch als `pages` geliefert werden. Abschnittstexte stehen unter `section`. Formulare werden mit `formBaseUrl` und der Formular-`id` geöffnet; Anwendungen und Online-Services verwenden `url`; Prozessseiten verwenden `content`; Downloads verwenden `url`.
 
-Die Kopfzeilensuche durchsucht alle fünf Kategorien nach Titel, Beschreibung und Suchbegriffen. `active: false` blendet einen Eintrag aus. Einträge mit `visibility` werden nicht nach OIDC-Gruppen gefiltert; die UI ersetzt keine serverseitige Berechtigungsprüfung.
+Die Kopfzeilensuche durchsucht alle fünf Kategorien nach Titel, Beschreibung und Suchbegriffen. `active` und `visibility` sind Backend-Metadaten: n8n muss Einträge vor der Auslieferung filtern und geschützte Requests serverseitig prüfen. Das Frontend zeigt alle gelieferten Einträge und wertet diese Felder nicht als Berechtigung aus.
 
 ## Anmeldung und Datenschutz
 

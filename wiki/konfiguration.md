@@ -38,4 +38,4 @@ Jede Kategorie kann zusätzlich `kicker` und `intro` in `section` führen. Apps 
 
 `memberLogin.url` startet den Login und fällt ohne URL auf `/webhook/oidc` zurück. `memberStatusUrl` und `memberLogout` konfigurieren Status- und Logout-Aufrufe.
 
-`active: false` blendet ein Item im Frontend aus. `visibility`, `person.gruppen` und OIDC-Rollen werden nicht für Gruppenfilterung verwendet. Die Kopfzeilensuche durchsucht alle fünf Kategorien nach `title`/`titel`, `description`/`beschreibung` und `searchTerms`, `searchKeywords`, `keywords`, `suchbegriffe`, `suchwoerter` oder `tags`.
+`active` und `visibility` sind Backend-Metadaten. Das Frontend filtert sie nicht; n8n entscheidet, welche Items ausgeliefert werden, und n8n/Form.io müssen geschützte Requests autorisieren. Die Kopfzeilensuche durchsucht alle fünf Kategorien nach `title`/`titel`, `description`/`beschreibung` und `searchTerms`, `searchKeywords`, `keywords`, `suchbegriffe`, `suchwoerter` oder `tags`.

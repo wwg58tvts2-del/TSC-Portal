@@ -1,5 +1,5 @@
 import {createApp} from "https://unpkg.com/petite-vue?module";
-import {state} from "./state.js?v=20260927-visible-items-2";
+import {state} from "./state.js?v=20260927-backend-access-1";
 
 
 window.showMsgBox = (titel, inhalt, zurueckNachSchliessen, options = {}) =>
