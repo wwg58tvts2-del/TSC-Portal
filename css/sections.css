@@ -10,7 +10,7 @@
 }
 
 .portal-login {
-  max-width: 680px;
+  width: min(100%, 680px);
   margin: 42px auto 72px;
 }
 
