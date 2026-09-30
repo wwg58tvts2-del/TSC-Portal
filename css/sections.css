@@ -10,12 +10,11 @@
 }
 
 .portal-login {
-  max-width: 900px;
+  max-width: 680px;
   margin: 42px auto 72px;
 }
 
 .portal-login-heading {
-  max-width: 680px;
   margin: 0 0 24px;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -36,7 +35,6 @@
 }
 
 .portal-login-intro {
-  max-width: 680px;
   margin: 0 0 30px;
   color: var(--muted);
   font-size: 1rem;
@@ -46,7 +44,6 @@
 .portal-login-controls {
   display: grid;
   gap: 14px;
-  max-width: 680px;
 }
 
 .portal-login-step-card {
