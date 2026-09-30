@@ -10,12 +10,13 @@
 }
 
 .portal-login {
-  max-width: 780px;
-  margin: 28px auto 64px;
+  max-width: 900px;
+  margin: 42px auto 72px;
 }
 
 .portal-login-heading {
-  margin: 0 0 22px;
+  max-width: 680px;
+  margin: 0 0 24px;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -36,7 +37,7 @@
 
 .portal-login-intro {
   max-width: 680px;
-  margin: 0 auto 24px;
+  margin: 0 0 30px;
   color: var(--muted);
   font-size: 1rem;
   line-height: 1.6;
@@ -45,17 +46,17 @@
 .portal-login-controls {
   display: grid;
   gap: 14px;
-  max-width: 560px;
-  margin: 0 auto;
+  max-width: 680px;
 }
 
 .portal-login-step-card {
   min-width: 0;
-  padding: 18px;
+  padding: 24px;
   background: #fafafa;
   border: 1px solid var(--line);
-  border-left: 4px solid var(--club-red);
+  border-top: 4px solid var(--club-red);
   border-radius: 4px;
+  box-shadow: 0 6px 18px rgb(35 20 15 / 6%);
 }
 
 .portal-login-step-heading {
@@ -108,7 +109,7 @@
 
 @media (max-width: 600px) {
   .portal-login {
-    margin: 16px auto 36px;
+    margin: 28px auto 48px;
   }
 
   .portal-login-heading h1 {
@@ -116,7 +117,7 @@
   }
 
   .portal-login-intro {
-    margin-bottom: 18px;
+    margin-bottom: 22px;
   }
 
   .portal-login-controls {
