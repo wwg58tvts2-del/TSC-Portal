@@ -1,7 +1,7 @@
 /* Reihenfolge ist relevant: responsive.css muss zuletzt kommen, um Medienabfragen zu überschreiben */
-@import url("base.css");
+@import url("base.css?v=20260930-login-layout-1");
 @import url("header.css?v=20260927-header-search-2");
-@import url("sections.css");
+@import url("sections.css?v=20260930-login-layout-1");
 @import url("cards.css");
 @import url("modal.css");
 @import url("footer.css");
