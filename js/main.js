@@ -1,5 +1,5 @@
 import {createApp} from "https://unpkg.com/petite-vue?module";
-import {state} from "./state.js?v=20260927-backend-access-1";
+import {state} from "./state.js?v=20261004-formio-load-guard";
 
 
 window.showMsgBox = (titel, inhalt, zurueckNachSchliessen, options = {}) =>

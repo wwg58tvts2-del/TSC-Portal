@@ -18,6 +18,9 @@ import {
   zerstoereFormular
 } from "./formio.js?v=20260925-oidc-logout-1";
 
+let formioLoadVersion = 0;
+let pendingFormioLoad = null;
+
 
 function normalisiereKonfiguration(konfiguration) {
   const {
@@ -568,6 +571,7 @@ export const state = reactive({
 
 
   oeffneBereich(bereich) {
+    this.zerstoereFormio();
     this.warnung = "";
     this.selectedBereich = bereich;
     this.view =
@@ -591,6 +595,7 @@ export const state = reactive({
 
 
   zerstoereFormio() {
+    formioLoadVersion += 1;
     zerstoereFormular(
       this.activeFormInstance
     );
@@ -622,24 +627,74 @@ export const state = reactive({
       return;
     }
 
-    try {
-      this.activeFormInstance =
-        await ladeFormular(
-          container,
-          formUrl,
-          {
-            onSubmitDone: async () => {
-              await this.ladeMemberDaten({ silent: true });
+    const loadVersion = ++formioLoadVersion;
 
-              if (this.person) {
-                this.selectedBereich = null;
-                this.view = "auswahl";
-                aktualisiereUrl(null);
-              }
-            }
+    if (pendingFormioLoad) {
+      try {
+        await pendingFormioLoad;
+      } catch {
+        // The active load handles and reports its own error.
+      }
+      if (loadVersion !== formioLoadVersion) {
+        return;
+      }
+    }
+
+    if (
+      loadVersion !== formioLoadVersion ||
+      this.view !== "formular" ||
+      this.selectedBereich?.type !== "form" ||
+      this.selectedBereich?.id !== bereich.id
+    ) {
+      return;
+    }
+
+    this.zerstoereFormio();
+    const currentLoadVersion = formioLoadVersion;
+    container.replaceChildren();
+    const formioLoad = ladeFormular(
+      container,
+      formUrl,
+      {
+        onSubmitDone: async () => {
+          await this.ladeMemberDaten({ silent: true });
+
+          if (
+            currentLoadVersion === formioLoadVersion &&
+            this.view === "formular" &&
+            this.selectedBereich?.id === bereich.id &&
+            this.person
+          ) {
+            this.selectedBereich = null;
+            this.view = "auswahl";
+            aktualisiereUrl(null);
           }
-        );
+        }
+      }
+    );
+    pendingFormioLoad = formioLoad;
+
+    try {
+      const instance = await formioLoad;
+      if (
+        currentLoadVersion !== formioLoadVersion ||
+        this.view !== "formular" ||
+        this.selectedBereich?.type !== "form" ||
+        this.selectedBereich?.id !== bereich.id
+      ) {
+        zerstoereFormular(instance);
+        return;
+      }
+      this.activeFormInstance = instance;
     } catch (error) {
+      if (
+        currentLoadVersion !== formioLoadVersion ||
+        this.view !== "formular" ||
+        this.selectedBereich?.type !== "form" ||
+        this.selectedBereich?.id !== bereich.id
+      ) {
+        return;
+      }
       console.error(
         "Der Bereich konnte nicht geladen werden:",
         error
@@ -654,6 +709,10 @@ export const state = reactive({
           Bitte versuche es später erneut.
         </div>
       `;
+    } finally {
+      if (pendingFormioLoad === formioLoad) {
+        pendingFormioLoad = null;
+      }
     }
   },
 
