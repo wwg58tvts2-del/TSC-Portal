@@ -11,7 +11,7 @@ Abhängigkeiten stehen in `package.json`/`package-lock.json`; `npm ci`, `npm run
 - `index.html`: einziger Vite-Einstieg.
 - `src/App.vue`: Router-Shell, Pinia-Initialisierung und Portal-Outlet.
 - `src/PortalPage.vue`: Header/Suche, fünf Kategorien, Login und Bereichsdetails.
-- `src/router.js`: Hash-Routen für Portal, Login und Bereich.
+- `src/router.js`: Pfadrouten für Portal, Login und `/<bereich-id>`.
 - `src/stores/exposeReactiveState.js`: Pinia-Adapter für bestehende Actions/Getters.
 - `js/state.js`: Task-Portal-Pinia-Store mit Normalisierung, OIDC, Suche und Form.io.
 - `js/api.js`: Fetch-Aufrufe und redigiertes Response-Logging.

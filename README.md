@@ -14,7 +14,7 @@ npm run dev
 npm run build
 ```
 
-Vite baut die SPA nach `dist/`; die Ansichten liegen unter `/#/`, `/#/login` und `/#/bereich/:id`.
+Vite baut die SPA nach `dist/`; Portal und Login liegen unter `/` und `/login`. Formulare und Prozessseiten öffnen direkt unter `/<bereich-id>`, zum Beispiel `/ANTRAG-ID`.
 
 ## Kategorien
 
@@ -36,7 +36,7 @@ Der Loginbutton startet den konfigurierten `memberLogin.url` oder `/webhook/oidc
 | `public/config.json` | URL zur Laufzeitkonfiguration |
 | `src/App.vue` | Router-Shell und Store-Initialisierung |
 | `src/PortalPage.vue` | Login, Kategorien, Suche und Bereichsdetails |
-| `src/router.js` | Hash-Routen für Portal, Login und Bereiche |
+| `src/router.js` | Pfadrouten für Portal, Login und Bereiche |
 | `src/stores/exposeReactiveState.js` | Pinia-Bindings für vorhandene Actions/Getters |
 | `js/main.js` | Vue-/Pinia-Mount und globale Integrationen |
 | `js/state.js` | Pinia-Store für Normalisierung, OIDC, Suche und Form.io |
