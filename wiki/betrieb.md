@@ -2,18 +2,20 @@
 
 ## Laufzeit
 
-Das Portal wird als statische Website ausgeliefert. Ein npm-/Buildprozess ist im Repository nicht vorhanden. Die HTML-Seite bindet Petite Vue, Bootstrap, Bootstrap Icons und Form.io über CDNs ein. Produktivbetrieb benötigt HTTPS und korrekt weitergereichte Cookies; OIDC-Status und Logout verwenden `cache: "no-store"`.
+Das Projekt benötigt Node.js 20.19 oder neuer. Lokal: `npm ci`, `npm run dev`; Produktion: `npm ci`, `npm run build`. Das Docker-Image baut mit Node 24 und liefert `dist/` über Nginx aus. Produktivbetrieb benötigt HTTPS und korrekt weitergereichte Cookies; OIDC-Status und Logout verwenden `cache: "no-store"`.
 
-`config.json` bestimmt den Konfigurationswebhook. Die OIDC-URLs und Form.io-Basisadresse kommen aus dessen Antwort. Änderungen an `index.html`, `main.js`, `state.js` oder CSS müssen mit den Cachekennungen in Script-, Modul- und Stylesheet-URLs abgestimmt werden.
+`public/config.json` bestimmt den Konfigurationswebhook. Die OIDC-URLs und Form.io-Basisadresse kommen aus dessen Antwort. Vite bündelt JavaScript/CSS mit Inhalts-Hashes; Konfiguration, Bilder und gepinnte Vendor-Dateien werden aus `public/` nach `dist/` kopiert.
 
-## Deployment
+## Test-Deployment
 
-Dieses Repository enthält keinen GitHub-Actions-Deploymentworkflow. Der produktive Veröffentlichungsweg ist daher nicht aus den Repository-Dateien ableitbar; vor einer Veröffentlichung den vereinbarten externen Deployprozess verwenden. Keine Live-n8n-Webhook-Aufrufe als lokalen Funktionstest behandeln.
+`.github/workflows/docker-image.yml` baut bei Pushes auf `main` das Image `ghcr.io/wwg58tvts2-del/tsc-portal` mit `latest` und Commit-SHA-Tags und ruft danach den Portainer-Test-Stack-Webhook auf. Dafür muss das GitHub-Secret `PORTAINER_WEBHOOK_URL` ausschließlich auf den Task-Portal-Test-Stack zeigen. Compose verwendet standardmäßig Port `8088`.
+
+Der Workflow aktualisiert nicht den Produktiv-Stack. GHCR-Zugangsdaten werden bei privatem Image in Portainer hinterlegt, nie im Repository. Keine Live-n8n-Webhook-Aufrufe als lokalen Funktionstest behandeln.
 
 ## Prüfung und Diagnose
 
-- JavaScript-Syntax: `node --check js/state.js` und `node --check js/main.js`.
-- JSON-Konfiguration: `python3 -m json.tool config.json`.
+- Produktionsbuild: `npm run build`.
+- JSON-Konfiguration: `python3 -m json.tool public/config.json`.
 - Suche: pro Kategorie Treffer, leere Suche und keine Treffer prüfen; `active` und `visibility` verbleiben beim Backend.
 - OIDC: Statusantwort, Cookie-Weitergabe, CSRF-Logout und 401/403-Pfad prüfen.
 - Form.io: HTTP-Fehler, fachliches `erfolgreich: false`, optionalen Download, Callback und `finally`-Cleanup prüfen.

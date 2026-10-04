@@ -2,7 +2,7 @@
 
 ## Einstiegspunkt
 
-Die im Repository enthaltene `config.json` verweist auf den n8n-Endpunkt:
+Die unter `public/config.json` abgelegte und unter `/config.json` ausgelieferte Datei verweist auf den n8n-Endpunkt:
 
 ```json
 {

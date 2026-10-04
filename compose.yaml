@@ -1,0 +1,6 @@
+services:
+  taskportal-test:
+    image: ghcr.io/wwg58tvts2-del/tsc-portal:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "${PORTAL_PORT:-8088}:80"

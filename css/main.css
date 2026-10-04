@@ -1,11 +1,10 @@
-/* Reihenfolge ist relevant: responsive.css muss zuletzt kommen, um Medienabfragen zu überschreiben */
-@import url("base.css?v=20260930-login-layout-1");
-@import url("header.css?v=20260927-header-search-2");
-@import url("sections.css?v=20260930-login-layout-1");
-@import url("cards.css");
-@import url("modal.css");
-@import url("footer.css");
-@import url("msgbox.css");
-@import url("loader.css");
-@import url("bereiche.css");
-@import url("responsive.css?v=20260927-header-search-2");
+/* responsive.css must remain last so its media rules can override earlier styles. */
+@import "./base.css";
+@import "./header.css";
+@import "./sections.css";
+@import "./cards.css";
+@import "./modal.css";
+@import "./footer.css";
+@import "./msgbox.css";
+@import "./loader.css";
+@import "./responsive.css";

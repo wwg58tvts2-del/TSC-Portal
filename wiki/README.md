@@ -9,5 +9,6 @@ Technische Referenz zum Task-Portal, erstellt aus dem aktuellen Frontend-Code. n
 | [OIDC und Form.io](oidc-und-formio.md) | Sitzung, CSRF-Logout, Formularabruf und Submit |
 | [Suche und Zugriff](suche-und-zugriff.md) | `visible`, Kategorien, Suchfelder und Berechtigungsgrenzen |
 | [Betrieb](betrieb.md) | Laufzeit, Cache, Fehleranalyse und Prüfgrenzen |
+| [Docker und Testbetrieb](../DOCKER.md) | GHCR-Image und Portainer-Test-Stack |
 
 Zurück zum [Projekt-README](../README.md) oder zu den [Arbeitsregeln](../agent.md).

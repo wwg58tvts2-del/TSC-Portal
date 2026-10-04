@@ -1,0 +1,9 @@
+Lokal eingebundene Frontend-Bibliotheken (Task-Portal)
+=====================================================
+Bootstrap 5.3.8
+Bootstrap Icons 1.13.1
+Form.io 5.6.1
+
+Die Original-Lizenzdateien liegen jeweils neben den Bibliotheken.
+Vue, Pinia und Vue Router werden ueber package-lock.json fixiert und von Vite
+in die Anwendung gebuendelt.

@@ -1,5 +1,16 @@
-import {createApp} from "https://unpkg.com/petite-vue?module";
-import {state} from "./state.js?v=20261004-formio-load-guard";
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import App from "../src/App.vue";
+import router from "../src/router.js";
+import { usePortalStore } from "./state.js";
+import "../css/main.css";
+import "../css/bereiche.css";
+
+const pinia = createPinia();
+const app = createApp(App);
+app.use(pinia);
+app.use(router);
+const state = usePortalStore(pinia);
 
 
 window.showMsgBox = (titel, inhalt, zurueckNachSchliessen, options = {}) =>
@@ -42,6 +53,4 @@ window.sendeFormular = (instance, config) =>
   state.sendeFormular(instance, config);
 
 
-createApp(state).mount("body");
-
-state.init();
+app.mount("#vue-app");

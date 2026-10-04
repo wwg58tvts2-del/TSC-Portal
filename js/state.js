@@ -1,4 +1,6 @@
-import { reactive } from "https://unpkg.com/petite-vue?module";
+import { reactive } from "vue";
+import { defineStore } from "pinia";
+import { exposeReactiveState } from "../src/stores/exposeReactiveState.js";
 
 import {
   hatSichtbarenCookie,
@@ -9,8 +11,7 @@ import {
 } from "./api.js?v=20260926-flat-config-1";
 
 import {
-  leseBereichIdAusUrl,
-  aktualisiereUrl
+  leseBereichIdAusUrl
 } from "./navigation.js?v=20260925-oidc-logout-1";
 
 import {
@@ -179,7 +180,8 @@ function normalisiereKonfiguration(konfiguration) {
 }
 
 
-export const state = reactive({
+export const usePortalStore = defineStore("task-portal", () => {
+  const state = reactive({
   config: null,
   person: null,
   view: "login",
@@ -203,19 +205,21 @@ export const state = reactive({
   },
 
   memberCheckTimer: null,
+  initStarted: false,
+  memberStatusChecked: false,
 
 
   async init() {
+    if (this.initStarted) {
+      return;
+    }
+    this.initStarted = true;
+
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && this.msgbox.visible) {
         this.schliesseMeldung();
       }
     });
-
-    window.addEventListener(
-      "popstate",
-      () => this.behandlePopState()
-    );
 
     await this.ladeConfig();
     this.starteMemberUeberwachung();
@@ -502,6 +506,7 @@ export const state = reactive({
       }
 
     } finally {
+      this.memberStatusChecked = true;
       if (!silent) {
         this.versteckeLadenIntern();
       }
@@ -520,7 +525,6 @@ export const state = reactive({
     this.selectedBereich = null;
     this.view = "login";
     this.warnung = "";
-    aktualisiereUrl(null);
   },
 
 
@@ -579,7 +583,6 @@ export const state = reactive({
         ? "formular"
         : "seite";
 
-    aktualisiereUrl(bereich.id);
   },
 
 
@@ -589,7 +592,6 @@ export const state = reactive({
     this.view = "auswahl";
     this.selectedBereich = null;
 
-    aktualisiereUrl(null);
     window.scrollTo(0, 0);
   },
 
@@ -667,7 +669,6 @@ export const state = reactive({
           ) {
             this.selectedBereich = null;
             this.view = "auswahl";
-            aktualisiereUrl(null);
           }
         }
       }
@@ -737,40 +738,6 @@ export const state = reactive({
 
       return;
     }
-
-    this.selectedBereich = bereich;
-    this.view =
-      bereich.type === "form"
-        ? "formular"
-        : "seite";
-  },
-
-
-  behandlePopState() {
-    if (!this.person) {
-      this.zeigeAnmeldung();
-      return;
-    }
-
-    const bereichId =
-      leseBereichIdAusUrl();
-
-    if (!bereichId) {
-      this.zerstoereFormio();
-
-      this.view = "auswahl";
-      this.selectedBereich = null;
-
-      return;
-    }
-
-    const bereich = this.findeBereich(bereichId);
-
-    if (!bereich) {
-      return;
-    }
-
-    this.zerstoereFormio();
 
     this.selectedBereich = bereich;
     this.view =
@@ -1063,4 +1030,7 @@ export const state = reactive({
   versteckeLadenIntern() {
     this.loading.visible = false;
   }
+  });
+
+  return exposeReactiveState(state);
 });
