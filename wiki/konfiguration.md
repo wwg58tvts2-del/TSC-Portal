@@ -6,7 +6,7 @@ Die unter `public/config.json` abgelegte und unter `/config.json` ausgelieferte 
 
 ```json
 {
-  "configUrl": "/webhook/config/portal"
+  "configUrl": "/webhook/portal-config"
 }
 ```
 
@@ -32,7 +32,9 @@ Die unter `public/config.json` abgelegte und unter `/config.json` ausgelieferte 
 }
 ```
 
-Jede Kategorie kann zusätzlich `kicker` und `intro` in `section` führen. Apps und Online-Services benötigen `url`; Form.io-Formulare benötigen `id`; Prozessseiten verwenden `content`; Downloads verwenden eine Datei-`url`. Die Legacy-Formate `pages`, `bereiche.items`, `areas`, `titel`, `beschreibung`, `typ`, `inhalt` und `neuesFenster` werden beim Laden teilweise übernommen.
+`areas[]` im System-JSON definiert die Portalbereiche in Reihenfolge. Jede Area enthält `id`, `type`, `section` und ihre in der API-Antwort ergänzten Items; die Tabellenzeilen werden anhand von `system_id` und `area == id` zugeordnet. `section` verwendet `kicker`, `title` und `intro`.
+
+`area.type` ist der Standardtyp für Items ohne eigenen Typ. Jedes Item kann `type` auf `form`, `page`, `link`, `app`, `service` oder `download` setzen. Formulare verwenden die Item-`id` und `formBaseUrl`; `width: 1` ist die Standardbreite, `width: 2` belegt zwei Kartenraster-Spalten. Link-Items verwenden `url` und `openInNewWindow: true` für ein neues Fenster (`false` öffnet im selben Fenster). Seiten verwenden `id` und `content`. Legacy-Felder wie `pages`, `bereiche.items`, `titel`, `beschreibung`, `typ`, `inhalt` und `neuesFenster` werden für die Übergangszeit normalisiert.
 
 ## Login und Suche
 

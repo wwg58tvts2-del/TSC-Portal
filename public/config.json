@@ -1,3 +1,4 @@
 {
-  "configUrl": "/webhook/config/portal"
+  "configUrl": "/webhook/portal-config",
+  "systemId": "portal"
 }

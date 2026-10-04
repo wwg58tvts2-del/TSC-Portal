@@ -21,15 +21,15 @@ Das Task-Portal ist eine Vue-3-SPA mit Vite, Pinia und Vue Router. Es gibt genau
 
 ## Startablauf
 
-1. `/config.json` liefert `configUrl` (aktuell `/webhook/config/portal`).
+1. `/config.json` liefert die Basis-URL `/webhook/portal-config`; das Frontend sendet `systemId=portal` als Query-Parameter.
 2. `state.js` lädt die Laufzeitkonfiguration ohne Cache und normalisiert die fünf Kategorien.
 3. `/webhook/oidc/me` wird geprüft; ohne Sitzung erscheint der Login.
 4. Nach Anmeldung erscheinen aktive Portal-Items. Die Suche setzt pro Item das Laufzeitfeld `visible`.
-5. Vue Router verwaltet `/`, `/login` und `/<bereich-id>`. Formulare werden über `formBaseUrl/<id>` in Form.io geöffnet; Prozessseiten zeigen `content` im Portal. Alte `/#/bereich/<id>`- und `/bereich/<id>`-Links werden migriert bzw. weitergeleitet.
+5. Vue Router verwaltet `/`, `/login` und `/<bereich-id>`. Formular- und Prozessareas navigieren anhand ihrer IDs; Form.io lädt über `formBaseUrl/<id>`, Prozessareas zeigen `content`. Alte Hash-/Query-Links werden migriert.
 
 ## Normalisierung
 
-Root-Listen `apps`, `forms`, `processes`, `onlineServices` und `downloads` werden unterstützt. Prozesse können auch unter `pages` oder in älteren `areas`-/`bereiche`-Strukturen liegen. Englische Felder wie `title`/`description` und ältere deutsche Varianten `titel`/`beschreibung` werden beim Laden normalisiert. Die Suche arbeitet auf dieser normalisierten Config, nicht direkt auf HTML.
+`areas[]` aus dem System-JSON ist die primäre Konfiguration für Portalbereiche. Alte Root-Listen, `pages` und `bereiche.items` werden vorübergehend in Areas normalisiert. Englische Felder wie `title`/`description` und ältere deutsche Varianten `titel`/`beschreibung` werden beim Laden normalisiert.
 
 ## Vertrauensgrenze
 

@@ -26,7 +26,7 @@ let pendingFormioLoad = null;
 function normalisiereKonfiguration(konfiguration) {
   const {
     bereiche,
-    areas: nestedAreas,
+    areas: rootAreaDefinitions,
     apps: rootApps,
     forms: rootForms,
     processes: rootProcesses,
@@ -36,7 +36,10 @@ function normalisiereKonfiguration(konfiguration) {
     pages: rootPages,
     ...rest
   } = konfiguration;
-  const quellAreas = nestedAreas || bereiche || {};
+  const dynamicAreas = Array.isArray(rootAreaDefinitions) ? rootAreaDefinitions : null;
+  const quellAreas = rootAreaDefinitions && !Array.isArray(rootAreaDefinitions)
+    ? rootAreaDefinitions
+    : bereiche || {};
   const {
     items,
     applikationen,
@@ -106,13 +109,15 @@ function normalisiereKonfiguration(konfiguration) {
       neuesFenster,
       inhalt,
       typ,
+      type: itemType,
       ...restEintrag
     } = eintrag || {};
     const visibility = eintrag?.visibility ?? sichtbarkeit ?? "all";
+    const resolvedType = String(itemType ?? typ ?? type).toLowerCase();
 
     return {
       ...restEintrag,
-      type,
+      type: resolvedType === "formular" ? "form" : resolvedType === "seite" ? "page" : resolvedType,
       title: eintrag?.title ?? titel ?? "",
       description: eintrag?.description ?? beschreibung ?? "",
       visibility: Array.isArray(visibility)
@@ -152,15 +157,34 @@ function normalisiereKonfiguration(konfiguration) {
         title: link.title ?? titel ?? ""
       }))
     : konfiguration.footer;
-    const processes = normalisiereBereichsliste(processesDaten, "page");
-    const onlineServices = normalisiereBereichsliste(rootOnlineServices ?? nestedOnlineServices, "service");
-    const downloads = normalisiereBereichsliste(rootDownloads ?? nestedDownloads, "download");
+  const processes = normalisiereBereichsliste(processesDaten, "page");
+  const onlineServices = normalisiereBereichsliste(rootOnlineServices ?? nestedOnlineServices, "service");
+  const downloads = normalisiereBereichsliste(rootDownloads ?? nestedDownloads, "download");
+  const areas = dynamicAreas
+    ? dynamicAreas.map((area) => {
+        const type = area.type || area.renderer || area.id;
+        return {
+          ...area,
+          type,
+          section: normalisiereSection(area.section),
+          items: (Array.isArray(area.items) ? area.items : [])
+            .map((eintrag) => normalisiereEintrag(eintrag, type))
+        };
+      })
+    : [
+        {id: "apps", type: "app", ...normalisiereBereichsliste(apps, "app")},
+        {id: "forms", type: "form", ...normalisiereBereichsliste(forms, "form")},
+        {id: "processes", type: "page", ...processes},
+        {id: "onlineservices", type: "service", ...onlineServices},
+        {id: "downloads", type: "download", ...downloads}
+      ];
 
   return {
     ...rest,
     memberLogin,
     memberLogout,
     footer,
+    areas,
     formBaseUrl: rootFormBaseUrl ?? quellAreas.formBaseUrl,
     processes,
     onlineServices,
@@ -249,16 +273,20 @@ export const usePortalStore = defineStore("task-portal", () => {
       const configUrl =
         konfigurationsQuelle.configUrl ||
         "/webhook/selfservice-config";
+      const configEndpoint = new URL(configUrl, window.location.origin);
+      if (konfigurationsQuelle.systemId) {
+        configEndpoint.searchParams.set("systemId", konfigurationsQuelle.systemId);
+      }
 
       try {
         this.config =
           await ladeConfigDaten(
-            configUrl
+            configEndpoint
           );
       } catch (webhookError) {
         // Solange n8n den Endpunkt nicht bereitstellt, lokale Testdaten verwenden.
         console.warn(
-          `[Vereinsportal] ${configUrl} nicht erreichbar, verwende config.local.json:`,
+          `[Vereinsportal] ${configEndpoint} nicht erreichbar, verwende config.local.json:`,
           webhookError
         );
 
@@ -321,6 +349,12 @@ export const usePortalStore = defineStore("task-portal", () => {
 
 
   get bereichsEintraege() {
+    if (Array.isArray(this.config?.areas)) {
+      return this.config.areas.flatMap((area) =>
+        Array.isArray(area.items) ? area.items : []
+      );
+    }
+
     const processes = Array.isArray(this.config?.processes?.items)
       ? this.config.processes.items
       : Array.isArray(this.config?.pages)
@@ -342,6 +376,21 @@ export const usePortalStore = defineStore("task-portal", () => {
     }
 
     return this.bereichsEintraege;
+  },
+
+
+  get sichtbareAreas() {
+    if (!this.person || !Array.isArray(this.config?.areas)) {
+      return [];
+    }
+
+    return this.config.areas
+      .map((area) => ({
+        ...area,
+        items: (Array.isArray(area.items) ? area.items : [])
+          .filter((item) => item.visible !== false)
+      }))
+      .filter((area) => area.items.length > 0);
   },
 
 

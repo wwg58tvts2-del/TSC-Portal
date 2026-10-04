@@ -130,65 +130,43 @@ export default {
       <p v-if="warnung" class="alert alert-warning" role="alert">{{ warnung }}</p>
       <p v-if="keineSuchergebnisse" class="portal-search-empty" role="status">Keine Ergebnisse gefunden</p>
 
-      <PortalSection id="forms-section" :section="config?.forms?.section" fallback-title="Formulare" :items="sichtbareFormulare">
+      <PortalSection
+        v-for="area in sichtbareAreas"
+        :id="area.id"
+        :key="area.id"
+        :section="area.section"
+        :fallback-title="area.title || area.id"
+        :items="area.items"
+        :options-class="area.optionsClass || (area.type === 'service' ? 'service-options' : area.type === 'download' ? 'download-options' : '')"
+      >
         <template #default="{ items }">
-          <PortalItemCard v-for="bereich in items" :key="bereich.id" :title="bereich.title" :description="bereich.description">
+          <PortalItemCard
+            v-for="(item, index) in items"
+            :key="item.id || item.url || `${area.id}-${index}`"
+            :class="{ 'form-option--wide': item.type === 'form' && Number(item.width) === 2 }"
+            :variant="['link', 'app', 'service'].includes(item.type) ? 'service' : item.type === 'download' ? 'download' : ''"
+            :title="item.title"
+            :description="item.description"
+          >
             <template #action>
-              <button class="form-button-label" type="button" @click="oeffneBereich(bereich)">
-                Formular öffnen
+              <button
+                v-if="item.type === 'form' || item.type === 'page'"
+                class="form-button-label"
+                type="button"
+                @click="oeffneBereich(item)"
+              >
+                {{ item.type === 'form' ? 'Formular öffnen' : 'Öffnen' }}
                 <i class="bi bi-arrow-right" aria-hidden="true"></i>
               </button>
-            </template>
-          </PortalItemCard>
-        </template>
-      </PortalSection>
-
-      <PortalSection id="processes-section" :section="config?.processes?.section" fallback-title="Prozesse" :items="sichtbareProzesse">
-        <template #default="{ items }">
-          <PortalItemCard v-for="prozess in items" :key="prozess.id" :title="prozess.title" :description="prozess.description">
-            <template #action>
-              <button class="form-button-label" type="button" @click="oeffneBereich(prozess)">
-                Öffnen
-                <i class="bi bi-arrow-right" aria-hidden="true"></i>
-              </button>
-            </template>
-          </PortalItemCard>
-        </template>
-      </PortalSection>
-
-      <PortalSection id="apps-section" :section="config?.apps?.section" fallback-title="Apps" :items="sichtbareApps">
-        <template #default="{ items }">
-          <PortalItemCard v-for="bereich in items" :key="bereich.url" :title="bereich.title" :description="bereich.description">
-            <template #action>
-              <a class="service-button" :href="bereich.url" :target="bereich.openInNewWindow ? '_blank' : '_self'" :rel="bereich.openInNewWindow ? 'noopener noreferrer' : null">
-                Öffnen
-                <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-              </a>
-            </template>
-          </PortalItemCard>
-        </template>
-      </PortalSection>
-
-      <PortalSection id="services-section" :section="config?.onlineServices?.section" fallback-title="Online-Services" :items="sichtbareOnlineServices" options-class="service-options">
-        <template #default="{ items }">
-          <PortalItemCard v-for="service in items" :key="service.id || service.url" variant="service" :title="service.title" :description="service.description">
-            <template #action>
-              <a class="service-button" :href="service.url" :target="service.openInNewWindow ? '_blank' : '_self'" :rel="service.openInNewWindow ? 'noopener noreferrer' : null">
-                Öffnen
-                <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
-              </a>
-            </template>
-          </PortalItemCard>
-        </template>
-      </PortalSection>
-
-      <PortalSection id="downloads-section" :section="config?.downloads?.section" fallback-title="Downloads" :items="sichtbareDownloads" options-class="download-options">
-        <template #default="{ items }">
-          <PortalItemCard v-for="download in items" :key="download.id || download.url" variant="download" :title="download.title" :description="download.description">
-            <template #action>
-              <a class="download-button" :href="download.url" target="_blank" rel="noopener noreferrer">
-                <i class="bi bi-download" aria-hidden="true"></i>
-                Download
+              <a
+                v-else
+                :class="item.type === 'download' ? 'download-button' : 'service-button'"
+                :href="item.url"
+                :target="(item.openInNewWindow ?? item.neuesFenster ?? item.type === 'download') ? '_blank' : '_self'"
+                :rel="(item.openInNewWindow ?? item.neuesFenster ?? item.type === 'download') ? 'noopener noreferrer' : null"
+              >
+                <i :class="item.type === 'download' ? 'bi bi-download' : 'bi bi-box-arrow-up-right'" aria-hidden="true"></i>
+                {{ item.type === 'download' ? 'Download' : 'Öffnen' }}
               </a>
             </template>
           </PortalItemCard>

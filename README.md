@@ -4,7 +4,7 @@ Vue-3-SPA für Anwendungen, Formulare, Prozessseiten, Online-Services und Downlo
 
 ## Start
 
-`public/config.json` verweist aktuell auf `/webhook/config/portal`. Die eigentliche Laufzeitkonfiguration kommt von diesem Endpunkt. Für Login und geschützte Formularrequests ist HTTPS mit funktionierender Cookie-Weitergabe erforderlich. Bootstrap, Bootstrap Icons und Form.io liegen lokal gepinnt unter `public/vendor/`.
+`public/config.json` enthält die Basis-URL `/webhook/portal-config`; das Frontend ergänzt `?systemId=portal`. Die eigentliche Laufzeitkonfiguration kommt von diesem Endpunkt. Für Login und geschützte Formularrequests ist HTTPS mit funktionierender Cookie-Weitergabe erforderlich. Bootstrap, Bootstrap Icons und Form.io liegen lokal gepinnt unter `public/vendor/`.
 
 Node.js 20.19 oder neuer wird benötigt:
 
@@ -18,7 +18,7 @@ Vite baut die SPA nach `dist/`; Portal und Login liegen unter `/` und `/login`. 
 
 ## Kategorien
 
-Die Root-Konfiguration enthält `apps.items`, `forms.items`, `processes.items`, `onlineServices.items` und `downloads.items`. Prozessseiten können auch als `pages` geliefert werden. Abschnittstexte stehen unter `section`. Formulare werden mit `formBaseUrl` und der Formular-`id` geöffnet; Anwendungen und Online-Services verwenden `url`; Prozessseiten verwenden `content`; Downloads verwenden `url`.
+Die Systemkonfiguration enthält eine geordnete Liste `areas[]` mit `id`, `type`, `section` und den aus `portal_item` geladenen `items`. Renderer-Typen sind `form`, `page`, `link` und `download`; neue Bereiche lassen sich im System-JSON definieren, ohne Vue-Markup zu ergänzen. Formulare verwenden `formBaseUrl` plus Item-`id`; Prozessseiten verwenden `content`, Links und Downloads verwenden `url`.
 
 Die Kopfzeilensuche durchsucht alle fünf Kategorien nach Titel, Beschreibung und Suchbegriffen. `active` und `visibility` sind Backend-Metadaten: n8n muss Einträge vor der Auslieferung filtern und geschützte Requests serverseitig prüfen. Das Frontend zeigt alle gelieferten Einträge und wertet diese Felder nicht als Berechtigung aus.
 
