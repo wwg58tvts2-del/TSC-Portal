@@ -11,7 +11,7 @@ defineEmits(["back"]);
     <div class="form-modal-backdrop" aria-hidden="true"></div>
     <div class="form-modal-dialog" role="dialog" aria-modal="true">
       <div class="form-modal-header">
-        <button class="btn btn-outline-secondary" type="button" @click="$emit('back')">
+        <button id="back-button" class="btn btn-outline-secondary" type="button" @click="$emit('back')">
           <i class="bi bi-arrow-left" aria-hidden="true"></i>
           Zurück
         </button>
