@@ -11,6 +11,14 @@ import PortalItemCard from "./components/PortalItemCard.vue";
 import PortalSection from "./components/PortalSection.vue";
 
 export default {
+  components: {
+    AreaModal,
+    LoginPanel,
+    PortalFooter,
+    PortalHeader,
+    PortalItemCard,
+    PortalSection
+  },
   setup() {
     const state = usePortalStore();
     const route = useRoute();
