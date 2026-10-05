@@ -143,7 +143,6 @@ export default {
           <PortalItemCard
             v-for="(item, index) in items"
             :key="item.id || item.url || `${area.id}-${index}`"
-            :class="{ 'form-option--wide': item.type === 'form' && Number(item.width) === 2 }"
             :variant="['link', 'app', 'service'].includes(item.type) ? 'service' : item.type === 'download' ? 'download' : ''"
             :title="item.title"
             :description="item.description"
@@ -178,7 +177,7 @@ export default {
         <div class="bereich-inhalt" v-html="selectedBereich?.content"></div>
     </AreaModal>
 
-    <AreaModal v-else :title="selectedBereich?.title" @back="zurueck">
+    <AreaModal v-else :title="selectedBereich?.title" :wide="Number(selectedBereich?.width) === 2" @back="zurueck">
         <div id="formio"></div>
     </AreaModal>
   </main>
