@@ -26,18 +26,22 @@ defineEmits(["back"]);
   <style scoped>
   .form-modal-dialog {
     width: 100%;
-    max-width: 520px;
+    max-width: none;
     margin: 0 auto;
   }
 
   .form-modal-dialog--wide {
-    max-width: 1040px;
+    position: relative;
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    padding-inline: clamp(20px, 3vw, 40px);
   }
 
   @media (max-width: 600px) {
     .form-modal-dialog,
     .form-modal-dialog--wide {
-      max-width: 100%;
+      padding-inline: 10px;
     }
   }
   </style>
