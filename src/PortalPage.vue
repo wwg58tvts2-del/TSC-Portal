@@ -178,7 +178,11 @@ export default {
     </AreaModal>
 
     <AreaModal v-else :title="selectedBereich?.title" :wide="Number(selectedBereich?.width) === 2" @back="zurueck">
-        <div id="formio"></div>
+      <header class="form-page-heading">
+        <h1>{{ selectedBereich?.title }}</h1>
+        <p v-if="selectedBereich?.description">{{ selectedBereich.description }}</p>
+      </header>
+      <div id="formio"></div>
     </AreaModal>
   </main>
 
@@ -200,3 +204,28 @@ export default {
     </div>
   </div>
 </template>
+
+<style scoped>
+.form-page-heading {
+  box-sizing: border-box;
+  margin: 4px 0 26px;
+  padding: 6px 4px 18px;
+  border-bottom: 2px solid #8b0000;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.form-page-heading h1 {
+  margin: 0;
+  color: #222;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.form-page-heading p {
+  margin: 8px 0 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+</style>
