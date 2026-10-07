@@ -154,11 +154,7 @@ function konfiguriereFormioFetch() {
  * @returns {Promise<Object>}
  *   Die erzeugte Form.io-Formularinstanz.
  */
-export async function ladeFormular(
-  container,
-  formUrl,
-  { onSubmitDone } = {}
-) {
+export async function ladeFormular(container, formUrl, { onSubmitDone } = {}){
 
   // Vor dem Erzeugen des Formulars sicherstellen, dass Webhook-Aufrufe
   // auf die aktuelle Portal-Instanz umgeleitet werden.
